@@ -46,7 +46,7 @@ export default function PersonalInformation(){
             <Text style={putxtStyle(1)}>Profile</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => [setRend(2), setShow(true)]} style={putbtnStyle(2)}>
-            <Text style={putxtStyle(2)}>My Life Story</Text>
+            <Text style={putxtStyle(2)}>Personal informations</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.row}>

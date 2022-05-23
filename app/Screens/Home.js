@@ -18,7 +18,7 @@ export default function Home(){
             <View style={styles.circle}>
               <Image source={require('./../Assets/icons/family.png')} style={styles.icon} />
             </View>
-            <Text style={styles.txt}>My Family</Text>
+            <Text style={styles.txt}>My Families</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('ReportIssue')} style={styles.rect}>
             <View style={styles.circle}>
@@ -32,7 +32,7 @@ export default function Home(){
             <View style={styles.circle}>
               <Image source={require('./../Assets/icons/story.png')} style={styles.icon} />
             </View>
-            <Text style={styles.txt}>My Life Story</Text>
+            <Text style={styles.txt}>Personal informations</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Resources')} style={styles.rect}>
             <View style={styles.circle}>

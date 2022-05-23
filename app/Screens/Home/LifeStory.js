@@ -12,12 +12,14 @@ export default function LifeStory(){
           <Image source={require('./../../Assets/icons/back.png')} style={styles.back} />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', marginLeft: -20 }}>
-          <Text style={{ color: '#000000' }}>My life story</Text>
+          <Text style={{ color: '#000000' }}>Personal infos</Text>
         </View>
       </View>
       <ScrollView style={styles.body}>
         <TouchableOpacity onPress={() => navigation.navigate("ParentInformation")} style={styles.btn}>
-          <View style={styles.blue}></View>
+          <View style={styles.leftIconView}>
+            <Image style={{height:50, width:50, resizeMode:'contain'}} source={require('./../../Assets/icons/couple.png')} />
+          </View>
           <View style={{ flex: 1, marginLeft: 7 }}>
             <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#424242' }}>Parent Information</Text>
           </View>
@@ -26,8 +28,9 @@ export default function LifeStory(){
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn}>
-          <View style={styles.green}></View>
-          <View style={{ flex: 1, marginLeft: 7 }}>
+          <View style={styles.leftIconView}>
+            <Image style={{height:50, width:50, resizeMode:'contain'}} source={require('./../../Assets/icons/bag.png')} />
+          </View><View style={{ flex: 1, marginLeft: 7 }}>
             <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#424242' }}>School Information</Text>
           </View>
           <View style={{ paddingRight: 15 }}>
@@ -35,7 +38,9 @@ export default function LifeStory(){
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn}>
-          <View style={styles.blue}></View>
+          <View style={styles.leftIconView}>
+            <Image style={{height:50, width:50, resizeMode:'contain'}} source={require('./../../Assets/icons/medicalnote.png')} />
+          </View>
           <View style={{ flex: 1, marginLeft: 7 }}>
             <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#424242' }}>Medical Information</Text>
           </View>
@@ -44,7 +49,9 @@ export default function LifeStory(){
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn}>
-          <View style={styles.green}></View>
+        <View style={styles.leftIconView}>
+            <Image style={{height:50, width:50, resizeMode:'contain'}} source={require('./../../Assets/icons/folders.png')} />
+          </View>
           <View style={{ flex: 1, marginLeft: 7 }}>
             <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#424242' }}>Placement History</Text>
           </View>
@@ -90,19 +97,11 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     borderRadius: 10
   },
-  blue: {
+  leftIconView: {
     width: 85,
     height: '100%',
-    backgroundColor: '#28A7E3',
-    borderTopRightRadius: 40,
-    borderBottomRightRadius: 40
-  },
-  green: {
-    backgroundColor: '#15B715',
-    width: 85,
-    height: '100%',
-    borderTopRightRadius: 40,
-    borderBottomRightRadius: 40
+    alignItems:'center',
+    justifyContent:'center',  
   },
   next: {
     width: 30,

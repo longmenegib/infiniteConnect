@@ -118,9 +118,10 @@ const AppStack = createBottomTabNavigator(
         tabBarIcon: ({ focused }) => (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Image
-              source={ focused ? require('./Assets/pics/belld.png') : require('./Assets/pics/bell.png') }
-              style={{ width: 25, height: 25, marginTop: 10 }} />
-              {focused ? <Text style={{ fontSize: 10, color: '#28A7E3' }}>Notifications</Text> : <Text style={{ fontSize: 10, color: '#AAAAAA' }}>Notifications</Text>}
+              // source={ focused ? require('./Assets/pics/phone.png') : require('./Assets/pics/bell.png') }
+              source={require('./Assets/pics/phone.png')}
+              style={{ width: 25, height: 25, marginTop: 10, tintColor: focused ? '#28A7E3' : 'gray' }} />
+              {focused ? <Text style={{ fontSize: 10, color: '#28A7E3' }}>Emergency</Text> : <Text style={{ fontSize: 10, color: '#AAAAAA' }}>Emergency</Text>}
           </View>
         )
       }
@@ -134,7 +135,7 @@ const AppStack = createBottomTabNavigator(
             <Image
               source={ focused ? require('./Assets/pics/userd.png') : require('./Assets/pics/user.png') }
               style={{ width: 25, height: 25, marginTop: 10 }} />
-              {focused ? <Text style={{ fontSize: 10, color: '#28A7E3' }}>My</Text> : <Text style={{ fontSize: 10, color: '#AAAAAA' }}>My</Text>}
+              {focused ? <Text style={{ fontSize: 10, color: '#28A7E3' }}>Me</Text> : <Text style={{ fontSize: 10, color: '#AAAAAA' }}>Me</Text>}
           </View>
         )
       }
