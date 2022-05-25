@@ -28,17 +28,17 @@ export default function GuestSignIn(){
           <TextInput
             value={name}
             onChangeText={e => setName(e)}
-            placeholder='Enter your name'
+            placeholder='Enter your id'
             keyboardType='default'
             style={styles.input}
           />
-          <TextInput
+          {/* <TextInput
             value={phone}
             onChangeText={e => setPhone(e)}
             placeholder='Enter your phone number'
             keyboardType='phone-pad'
             style={styles.input} 
-          />
+          /> */}
           <TouchableOpacity onPress={() => handleSignIn()} style={[styles.input, { marginTop: 30, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
             <Text style={{ color: '#15B715', fontSize: 17 }}>Sign In & Continue</Text>
           </TouchableOpacity>
