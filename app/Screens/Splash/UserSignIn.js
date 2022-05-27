@@ -9,7 +9,7 @@ export default function UserSignIn(){
   const [id, setId] = useState(null);
 
   const handleSignIn = async() => {
-    await AsyncStorage.setItem('userToken', 'Infinity');
+    // await AsyncStorage.setItem('userToken', 'Infinity');
     navigation.navigate("Home");
   }
 

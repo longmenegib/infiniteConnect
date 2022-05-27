@@ -29,6 +29,7 @@ import Resources from './Screens/Home/Resources';
 import NewGroupChat from './Screens/Chat/NewGroup';
 import UserConvo from './Screens/Chat/UserConvo';
 import GroupConvo from './Screens/Chat/GroupConvo';
+import GuestMore from './Screens/Splash/GuestMore';
 
 const customTextProps = {
   style: {
@@ -178,7 +179,8 @@ const AuthStack = createStackNavigator(
     First: FirstStepper,
     Second: SecondStepper,
     UserSignIn: UserSignIn,
-    GuestSignIn: GuestSignIn
+    GuestSignIn: GuestSignIn,
+    GuestMore: GuestMore,
   },
   {
     defaultNavigationOptions: {

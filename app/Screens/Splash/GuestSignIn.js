@@ -9,8 +9,8 @@ export default function GuestSignIn(){
   const [phone, setPhone] = useState(null);
 
   const handleSignIn = async() => {
-    await AsyncStorage.setItem('userToken', 'Infinity');
-    navigation.navigate("Home");
+    // await AsyncStorage.setItem('userToken', 'Infinity');
+    navigation.navigate("GuestMore");
   }
 
   return(
