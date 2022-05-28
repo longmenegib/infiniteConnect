@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ImageBackground, Image, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import { authContext } from '../Context.js/authContext';
 
 export default function PersonalInformation(){
   const navigation = useNavigation();
   const [rend, setRend] = useState(1);
   const [show, setShow] = useState(false);
+  const {user} = useContext(authContext);
 
   const putbtnStyle = (e) => {
     if(e == rend){
@@ -38,6 +40,8 @@ export default function PersonalInformation(){
     )
   }
 
+  const dateOptions = {weekday: 'long', year:'numeric', month:'long', day:'numeric'};
+  const birthdate = new Date(user?.birthdate);
   return(
     <ImageBackground source={require('./../Assets/bg.png')} style={styles.main}>
       <View style={{ flex: 1 }}>
@@ -54,21 +58,21 @@ export default function PersonalInformation(){
             <Image source={require('./../Assets/icons/camera.png')} style={styles.img} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'black' }}>Nelson Nokimi</Text>
-            <Text style={{ fontSize: 16, color: '#424242' }}>Buea, Santa</Text>
-            <Text style={{ color: '#999999' }}>This is the biography of this weird dude that I don't even know or like.</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'black' }}>{user?.first_name +'  '+ user?.last_name}</Text>
+            {/* <Text style={{ fontSize: 16, color: '#424242' }}>Buea, Santa</Text>
+            <Text style={{ color: '#999999' }}>This is the biography of this weird dude that I don't even know or like.</Text> */}
           </View>
         </View>
         <View style={{ paddingVertical: 20, width: '100%', borderBottomColor: '#aaa', borderBottomWidth: 0.5 }}>
           <Text style={styles.label}>Gender</Text>
-          <Text style={styles.val}>Male</Text>
+          <Text style={styles.val}>{user?.sex}</Text>
         </View>
         <View style={{ paddingVertical: 20, width: '100%', borderBottomColor: '#aaa', borderBottomWidth: 0.5 }}>
           <Text style={styles.label}>Date of birth</Text>
-          <Text style={styles.val}>01 January 1989</Text>
+          <Text style={styles.val}>{birthdate.toLocaleDateString("en-US", dateOptions)}</Text>
           <View style={{ marginTop: 15 }} />
           <Text style={styles.label}>E-mail</Text>
-          <Text style={styles.val}>nel.nok@gmail.com</Text>
+          <Text style={styles.val}>{user?.email ? user.email:"No email"}</Text>
         </View>
       </View>
       {putModal()}

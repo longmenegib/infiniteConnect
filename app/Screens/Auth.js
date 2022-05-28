@@ -21,7 +21,7 @@ export default function Auth() {
     // console.log("Previous user token: ", userToken);
     // console.log("Previous user Id: ", userId);
     try {
-      const apiPoint= `${baseURL}user-api/users/${userId}/`;
+      const apiPoint= `${baseURL}user-api/kids/${userId}/`;
       console.log("Api point: ",apiPoint)
       if(userToken) {
         axios.defaults.headers.common['Authorization'] = `Token ${userToken}`;

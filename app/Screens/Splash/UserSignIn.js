@@ -23,7 +23,7 @@ export default function UserSignIn(){
         const {result} = await (await axios.post(baseURL + 'user-api/verify/kid', {otp, phone} )).data;
         console.log("Kid registration data: ",result);
         
-        const apiPoint= `${baseURL}user-api/users/${result.kid.id}/`;
+        const apiPoint= `${baseURL}user-api/kids/${result.kid.id}/`;
         // console.log("Api point: ", apiPoint);
         const userData = await (await axios.get(apiPoint, {headers: {"Authorization":`Token ${result.token}`}})).data;
         // console.log('User informations: ', userData);
