@@ -26,7 +26,10 @@ export default function UserSignIn(){
         // console.log("User: ", result.kid)
         // console.log('User token: ', result.token)
         if (remember) {
-          await AsyncStorage.setItem('userToken', result.token);
+          await Promise.all([
+            AsyncStorage.setItem('userId', JSON.stringify(result.kid.id)),
+            AsyncStorage.setItem('userToken', result.token),
+          ]);
         }
         navigation.navigate("Home");
       } catch (error) {

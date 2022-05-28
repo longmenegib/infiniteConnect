@@ -51,7 +51,7 @@ export default function PersonalInformation(){
         </View>
         <View style={styles.row}>
           <View style={styles.pic}>
-            <Image source={require('./../Assets/person.jpg')} style={styles.img} />
+            <Image source={require('./../Assets/icons/camera.png')} style={styles.img} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'black' }}>Nelson Nokimi</Text>
@@ -96,8 +96,11 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   pic: {
-    width: 120,
-    height: 100
+    width: 100,
+    height: 100,
+    backgroundColor:'gray',
+    marginRight:20,
+    borderRadius:50
   },
   img: {
     width: 100,

@@ -1,1 +1,1 @@
-export const baseURL = 'https://infinite-connect.herokuapp.com/';
+export const baseURL = 'http://infinite-connect.herokuapp.com/';
