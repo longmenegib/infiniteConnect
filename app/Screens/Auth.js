@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { ActivityIndicator, StatusBar, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "react-navigation-hooks";
@@ -7,17 +7,19 @@ import { useNavigation } from "react-navigation-hooks";
 import Splash from './Splash';
 import axios from 'axios';
 import { baseURL } from '../../utilis/urls';
+import { authContext } from '../Context.js/authContext';
 
 //import Url from '../resources/Url';
 
 export default function Auth() {
   const navigation = useNavigation();
+  const {setUser} = useContext(authContext);
 
   const _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const userId = await AsyncStorage.getItem('userId');
-    console.log("Previous user token: ", userToken);
-    console.log("Previous user Id: ", userId);
+    // console.log("Previous user token: ", userToken);
+    // console.log("Previous user Id: ", userId);
     try {
       const apiPoint= `${baseURL}user-api/users/${userId}/`;
       console.log("Api point: ",apiPoint)
@@ -25,7 +27,8 @@ export default function Auth() {
         axios.defaults.headers.common['Authorization'] = `Token ${userToken}`;
       }
       const userData = await (await axios.get(apiPoint)).data;
-      console.log('User informations: ', userData);
+      // console.log('User informations: ', userData);
+      setUser(userData);
     } catch (error) {
       console.log(error.response.data);
     }
