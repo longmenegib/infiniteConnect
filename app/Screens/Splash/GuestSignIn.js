@@ -2,15 +2,33 @@ import React, { useState } from 'react';
 import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, StatusBar, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from 'react-navigation-hooks';
+import axios from 'axios';
+import { baseURL } from '../../../utilis/urls';
 
 export default function GuestSignIn(){
   const navigation = useNavigation();
-  const [name, setName] = useState('');
+  const [otp, setOtp] = useState('');
   const [phone, setPhone] = useState(null);
 
   const handleSignIn = async() => {
-    // await AsyncStorage.setItem('userToken', 'Infinity');
-    navigation.navigate("GuestMore");
+    if (otp && phone) {
+      console.log('Starting verification...');
+      console.log('Otp: ', otp, 'Phone: ', phone)
+      // await AsyncStorage.setItem('userToken', 'Infinity');
+      // navigation.navigate("Home");
+      try{
+        const {result} = await axios.post(baseURL + 'user-api/verify/family-member',{otp, phone} );
+        console.log("Registered family member: ",result.kid);
+        // if (!result) navigation.navigate("Home");
+      } catch (error) {
+        console.log('Error during authentication: ', error.response.status);
+        if(error.response.status===500) {
+          console.log("The otp code and the phone number does'nt correspond")
+        } else {
+          console.log("There was an error")
+        }
+      }
+    }
   }
 
   return(
@@ -26,10 +44,17 @@ export default function GuestSignIn(){
         <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'black' }}>Sign In</Text>
         <View style={styles.section}>
           <TextInput
-            value={name}
-            onChangeText={e => setName(e)}
-            placeholder='Enter your id'
+            value={otp}
+            onChangeText={e => setOtp(e.toString())}
+            placeholder='Enter your otp'
             keyboardType='default'
+            style={styles.input}
+          />
+          <TextInput
+            value={phone}
+            onChangeText={e => setPhone(e)}
+            placeholder='Enter your phone number'
+            keyboardType='phone-pad'
             style={styles.input}
           />
           {/* <TextInput
@@ -81,6 +106,7 @@ const styles = StyleSheet.create({
     height: 56,
     paddingLeft: 25,
     opacity: 0.7,
+    // marginTop:5,
     marginBottom: 25
   },
   logo: {

@@ -1,16 +1,45 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Image, TextInput, Dimensions } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { baseURL } from '../../../utilis/urls';
+import { authContext } from '../../Context.js/authContext';
 
 export default function UserSignIn(){
   const navigation = useNavigation();
   const [remember, setRemember] = useState(false);
-  const [id, setId] = useState(null);
-
+  const [otp, setOtp] = useState('');
+  const [phone, setPhone] = useState('');
+  const [apiError, setApiError] = useState(null);
+  const {setUser} = useContext(authContext)
+  
   const handleSignIn = async() => {
-    // await AsyncStorage.setItem('userToken', 'Infinity');
-    navigation.navigate("Home");
+    setApiError(null)
+    if (otp && phone) {
+      console.log('Starting verification...');
+      console.log('Otp: ', otp, 'Phone: ', phone)
+      try{
+        const {result} = await (await axios.post(baseURL + 'user-api/verify/kid', {otp, phone} )).data;
+        console.log("Kid registration data: ",result);
+        await setUser(result.kid);
+        // console.log("User: ", result.kid)
+        // console.log('User token: ', result.token)
+        if (remember) {
+          await AsyncStorage.setItem('userToken', result.token);
+        }
+        navigation.navigate("Home");
+      } catch (error) {
+        // console.log("Error during verification: ",JSON.stringify(error))
+        console.log(error.response.status);
+        console.log(error.response.data);
+        setApiError(error.response.data.error);
+        // console.log(error.response.headers);
+        
+      }
+    } else {
+      setApiError('phone and id numbers must not be empty')
+    }
   }
 
   return(
@@ -26,11 +55,18 @@ export default function UserSignIn(){
         <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'black' }}>Sign In</Text>
         <View style={styles.section}>
           <TextInput 
-            value={id}
-            onChangeText={e => setId(e)}
+            value={otp}
+            onChangeText={e => setOtp(e.toString())}
             placeholder='Enter your user ID'
+            style={[styles.input, {marginBottom:30}]} 
+          />
+          <TextInput 
+            value={phone}
+            onChangeText={(e) => setPhone(e)}
+            placeholder='Enter your phone number'
             style={styles.input} 
           />
+          {apiError? <Text style={{color:'red', alignSelf:'center'}} >{apiError}</Text> : null }
           <View style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <TouchableOpacity onPress={() => setRemember(!remember)} style={{ flexDirection: 'row' }}>
               {remember ? (<View style={styles.checked} />) : (<View style={styles.check} />)}
@@ -40,7 +76,7 @@ export default function UserSignIn(){
               <Text style={{ color: '#424242' }}>Forgot your ID? <Text style={{ color: '#15B715' }}>Request new</Text></Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => handleSignIn()} style={[styles.input, { marginTop: 50, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
+          <TouchableOpacity onPress={() => handleSignIn()} style={[styles.input, { marginTop: 40, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
             <Text style={{ color: '#15B715', fontSize: 17 }}>Sign In & Continue</Text>
           </TouchableOpacity>
         </View>

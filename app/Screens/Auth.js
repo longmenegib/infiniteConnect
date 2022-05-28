@@ -17,6 +17,7 @@ export default function Auth() {
 
   const _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
+    console.log("Previous user token: ", userToken);
     setTimeout(() => navigation.navigate(userToken ? 'App' : 'Auth'), 1.5*1000)
   };
 
