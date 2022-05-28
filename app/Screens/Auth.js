@@ -21,7 +21,9 @@ export default function Auth() {
     try {
       const apiPoint= `${baseURL}user-api/users/${userId}/`;
       console.log("Api point: ",apiPoint)
-      axios.defaults.headers.common['Authorization'] = `Token ${userToken}`;
+      if(userToken) {
+        axios.defaults.headers.common['Authorization'] = `Token ${userToken}`;
+      }
       const userData = await (await axios.get(apiPoint)).data;
       console.log('User informations: ', userData);
     } catch (error) {

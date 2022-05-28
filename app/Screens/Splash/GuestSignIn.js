@@ -1,33 +1,46 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, StatusBar, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from 'react-navigation-hooks';
 import axios from 'axios';
 import { baseURL } from '../../../utilis/urls';
+import { authContext } from '../../Context.js/authContext';
 
 export default function GuestSignIn(){
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
   const [phone, setPhone] = useState(null);
+  const [apiError, setApiError] = useState(null);
+  const {setUser} = useContext(authContext);
 
   const handleSignIn = async() => {
+    setApiError(null)
     if (otp && phone) {
       console.log('Starting verification...');
       console.log('Otp: ', otp, 'Phone: ', phone)
-      // await AsyncStorage.setItem('userToken', 'Infinity');
-      // navigation.navigate("Home");
       try{
-        const {result} = await axios.post(baseURL + 'user-api/verify/family-member',{otp, phone} );
-        console.log("Registered family member: ",result.kid);
-        // if (!result) navigation.navigate("Home");
+        const {result} = await (await axios.post(baseURL + 'user-api/verify/family-member', {otp, phone} )).data;
+        console.log("Kid registration data: ",result);
+        await setUser(result.kid);
+        // console.log("User: ", result.kid)
+        // console.log('User token: ', result.token)
+        // if (remember) {
+        //   await Promise.all([
+        //     AsyncStorage.setItem('userId', JSON.stringify(result.kid.id)),
+        //     AsyncStorage.setItem('userToken', result.token),
+        //   ]);
+        // }
+        navigation.navigate("GuestMore");
       } catch (error) {
-        console.log('Error during authentication: ', error.response.status);
-        if(error.response.status===500) {
-          console.log("The otp code and the phone number does'nt correspond")
-        } else {
-          console.log("There was an error")
-        }
+        // console.log("Error during verification: ",JSON.stringify(error))
+        console.log(error.response.status);
+        console.log(error.response.data);
+        setApiError(error.response.data.error);
+        // console.log(error.response.headers);
+        
       }
+    } else {
+      setApiError('phone and id numbers must not be empty')
     }
   }
 
@@ -46,7 +59,7 @@ export default function GuestSignIn(){
           <TextInput
             value={otp}
             onChangeText={e => setOtp(e.toString())}
-            placeholder='Enter your otp'
+            placeholder='Enter your user Id'
             keyboardType='default'
             style={styles.input}
           />
@@ -57,6 +70,7 @@ export default function GuestSignIn(){
             keyboardType='phone-pad'
             style={styles.input}
           />
+          {apiError? <Text style={{color:'red', alignSelf:'center'}} >{apiError}</Text> : null }
           {/* <TextInput
             value={phone}
             onChangeText={e => setPhone(e)}
