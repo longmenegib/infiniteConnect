@@ -1,11 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import { baseURL } from '../../../utilis/urls';
+import axios from 'axios';
 
 export default function MyFamily(){
   const navigation = useNavigation();
-  const families = [ 1, 2, 3, 4, 5];
+  const prevfamilies = [ 1, 2, 3, 4, 5];
+  const [families, setFamilies] = useState([]);
+  
+  const getFamilies = async() => {
+    try {
+      const result = await (await axios.get(baseURL+'family-api/families/')).data
+      // console.log('Result: ', result);
+      setFamilies(result.results)
+    } catch (error) {
+      console.log('Server status: ',error.response.status);
+      console.log("error: ",error.response.data.error);
+    }
+  }
 
+  useEffect(() => {
+    getFamilies()
+  }, [])
   return(
     <View style={styles.main}>
       <View style={styles.header}>
@@ -25,18 +42,18 @@ export default function MyFamily(){
         </View>
       </View>
       <ScrollView style={styles.body}>
-        {families.map(i => {
+        {families.map((family, i) => {
           return(
-            <TouchableOpacity onPress={() => navigation.navigate('ViewFamily', {id: i})} style={styles.family}>
+            <TouchableOpacity onPress={() => navigation.navigate('ViewFamily', {familyObj: JSON.stringify(family)})} style={styles.family}>
               <Image source={require('./../../Assets/family.jpg')} style={styles.img} />
               <TouchableOpacity style={styles.likebtn}>
                 <Image style={styles.heart} source={i%2? require('./../../Assets/icons/heart.png'): require('./../../Assets/icons/heartd.png')} />
               </TouchableOpacity>
               <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>Family Name</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>{family.family_name}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Image source={require('./../../Assets/icons/location.png')} style={styles.back} />
-                  <Text style={{ marginLeft: 5, color: '#424242' }}>Buea, Cameroon</Text>
+                  <Text style={{ marginLeft: 5, color: '#424242' }}>{family.address}</Text>
                 </View>
               </View>
             </TouchableOpacity>

@@ -14,6 +14,8 @@ export default function ViewFamily(){
     setShow(false);
   }
 
+  const family = JSON.parse(navigation.state.params.familyObj);
+  console.log('Family name: ', family.family_name);
   const putModal = () => {
     return(
       <Modal animationType={"slide"} transparent={true} visible={show} onRequestClose={() => setShow(false) }>
@@ -43,7 +45,7 @@ export default function ViewFamily(){
           <Image source={require('./../../Assets/icons/back.png')} style={styles.icon} />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', marginLeft: -20 }}>
-          <Text style={{ color: 'black' }}>Name of family</Text>
+          <Text style={{ color: 'black' }}>{family.family_name}</Text>
         </View>
       </View>
       <ScrollView style={[styles.main, { paddingTop: 20 }]}>
@@ -51,10 +53,10 @@ export default function ViewFamily(){
         <View style={styles.top}>
           <Image source={require('./../../Assets/family.jpg')} style={styles.img} />
           <View style={styles.info}>
-            <Text numberOfLines={1} style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>Name of fmaily</Text>
+            <Text numberOfLines={1} style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>{family.family_name}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
               <Image source={require('./../../Assets/icons/location.png')} style={styles.icon} />
-              <Text numberOfLines={1} style={{ marginLeft: 5, color: '#424242' }}>Buea, Cameroon</Text>
+              <Text numberOfLines={1} style={{ marginLeft: 5, color: '#424242' }}>{family.address}</Text>
             </View>
           </View>
         </View>
@@ -75,12 +77,6 @@ export default function ViewFamily(){
             )
           })}
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('CreateFamily')} style={styles.fab}>
-        <View style={styles.btn}>
-          <Image source={require('./../../Assets/icons/group.png')} style={{ width: 35, height: 35 }} />
-        </View>
-        <Text style={styles.fabtxt}>New family group</Text>
-      </TouchableOpacity>
       <TouchableOpacity onPress={() => setShow(true)} style={styles.fab}>
         <View style={styles.btn}>
           <Image source={require('./../../Assets/icons/wuser.png')} style={{ width: 35, height: 35 }} />
