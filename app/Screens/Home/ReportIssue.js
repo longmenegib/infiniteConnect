@@ -27,12 +27,12 @@ export default function ReportIssue(){
   };
 
   const onIssueReport = async() => {
-    if(issueDetails) {
+    if(issueTitle && issueDetails) {
       console.log('starting query...');
       console.log('description: ', issueDetails);
       const userToken = await AsyncStorage.getItem('userToken');
       try {
-        const result = await (await axios.post(baseURL+'report-api/issues/', {title:issueTitle, description:issueDetails},{headers:{'Authorization':'Token '+userToken}})).data;
+        const result = await (await axios.post(baseURL+'report-api/issues/', {title:issueTitle, description:issueDetails})).data;
         console.log('Report result: ', result);
       } catch (error) {
         // console.log('Error during the post: ', error.response.data.error)

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StatusBar, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "react-navigation-hooks";
@@ -14,18 +14,23 @@ import { authContext } from '../Context.js/authContext';
 export default function Auth() {
   const navigation = useNavigation();
   const {setUser} = useContext(authContext);
+  const [token, setToken] = useState(null)
+
+  useEffect(() => {
+    if(token) {
+      axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+    }
+  }, [token])
 
   const _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const userId = await AsyncStorage.getItem('userId');
+    if(userToken) {setToken(userToken)};
     // console.log("Previous user token: ", userToken);
     // console.log("Previous user Id: ", userId);
     try {
       const apiPoint= `${baseURL}user-api/kids/${userId}/`;
       console.log("Api point: ",apiPoint)
-      if(userToken) {
-        axios.defaults.headers.common['Authorization'] = `Token ${userToken}`;
-      }
       const userData = await (await axios.get(apiPoint)).data;
       // console.log('User informations: ', userData);
       setUser(userData);
