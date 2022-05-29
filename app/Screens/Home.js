@@ -32,7 +32,7 @@ export default function Home(){
             <View style={styles.circle}>
               <Image source={require('./../Assets/icons/story.png')} style={styles.icon} />
             </View>
-            <Text style={styles.txt}>Personal informations</Text>
+            <Text style={styles.txt}>My life story</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Resources')} style={styles.rect}>
             <View style={styles.circle}>

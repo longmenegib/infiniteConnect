@@ -26,14 +26,14 @@ export default function ParentInformation(){
   }, [])
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10 }}>
           <Image source={require('./../../Assets/icons/back.png')} style={styles.back} />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', marginLeft: -20 }}>
           <Text style={{ color: 'black' }}>Parent Information</Text>
         </View>
-      </View>
+      </View> */}
       <ScrollView style={styles.body}>
         <View>
           <View style={styles.row}>
