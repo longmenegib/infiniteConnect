@@ -1,12 +1,29 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ImageBackground } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import { baseURL } from '../../../utilis/urls';
 
 export default function CreateFamily(){
   const navigation = useNavigation();
+  const [familyName, setFamilyName] = useState('');
+  const [familyAddress, setFamilyAddress] = useState('');
+  const [apiError, setApiError] = useState(null);
 
-  const handleCreate = () => {
-    navigation.navigate('InitFamily');
+  const handleCreate = async() => {
+    setApiError(false)
+    if (familyName) {
+      try {
+        const result= await (await axios.post(baseURL+'family-api/families/', {family_name:familyName, address:familyAddress})).data
+        console.log('Query result: ', result);
+        navigation.navigate('InitFamily', {familyObj: JSON.stringify(result)});
+      } catch (error) {
+        setApiError(true);
+        console.log('Error during the post: ', error.response.data.error);
+        console.log('Server status: ',error.response.status);
+        // console.log("error: ",error.response.data.error);
+      }
+    }
   }
 
   return(
@@ -33,6 +50,7 @@ export default function CreateFamily(){
           <TextInput
             placeholder='Name of family'
             style={styles.input}
+            onChangeText={(text) => setFamilyName(text)}
           />
         </View>
         <View style={styles.drow}>
@@ -40,8 +58,10 @@ export default function CreateFamily(){
           <TextInput
             placeholder='Address'
             style={styles.input}
+            onChangeText={(text)=> setFamilyAddress(text)}
           />
         </View>
+        {apiError? <Text>An error occured. please, try again</Text>:null}
         <TouchableOpacity onPress={() => handleCreate()} style={styles.btn}>
           <Text style={{ color: 'white', fontSize: 18 }}>Create</Text>
         </TouchableOpacity>
