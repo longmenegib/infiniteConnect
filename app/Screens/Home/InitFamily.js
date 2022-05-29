@@ -10,19 +10,24 @@ export default function InitFamily(){
   const [show, setShow] = useState(false);
   const [inviteePhone, setInviteePhone] = useState('');
   const [family, setFamily] = useState(JSON.parse(navigation.state.params.familyObj))
+  const [apiError, setApiError] = useState('');
 
   const {user} = useContext(authContext);
 
   const sendInvitation = async() => {
-    try {
-      const result = await (await axios.post(baseURL+user.id+'/invite-family', {phone:inviteePhone})).data;
-      console.log(result)
-    } catch (error) {
-      console.log('Error during the post: ', error.response.data.error);
-      console.log('Server status: ',error.response.status);
-      // console.log("error: ",error.response.data.error);
+    setApiError('');
+    if(inviteePhone) {
+      try {
+        const result = await (await axios.post(baseURL+user.id+'/invite-family', {phone:inviteePhone})).data;
+        console.log(result)
+      } catch (error) {
+        setApiError('an error occured');
+        console.log('Error during the post: ', error.response.data.error);
+        console.log('Server status: ',error.response.status);
+        // console.log("error: ",error.response.data.error);
+      }
+      setShow(false);
     }
-    setShow(false);
   }
   // console.log('Family: address', family.address);
   const putModal = () => {
@@ -42,6 +47,7 @@ export default function InitFamily(){
             <TouchableOpacity onPress={() => sendInvitation()} style={styles.btn}>
               <Text style={{ color: 'white' }}>Send Invitation</Text>
             </TouchableOpacity>
+            {apiError ? <Text style={{marginTop:5, alignSelf:'center', color:'red'}}>{apiError}</Text>: null}
           </View>
         </View>
       </Modal>

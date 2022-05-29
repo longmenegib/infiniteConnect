@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Text, StyleSheet, Image, TouchableOpacity, StatusBar, Modal, TextInput } from 'react-native';
 import { useNavigation, useNavigationState } from 'react-navigation-hooks';
@@ -6,32 +7,47 @@ export default function ViewFamily(){
   const navigation = useNavigation();
   const params = useNavigationState().params;
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState(null);
+  const [inviteePhone, setInviteePhone] = useState('');
+  const [apiError, setApiError] = useState('');
 
   const members = [1, 2, 3, 4, 5, 6];
 
-  const sendInvitation = () => {
-    setShow(false);
+  const sendInvitation = async() => {
+    setApiError('');
+    if (inviteePhone){
+      try {
+        const result = await (await axios.post(baseURL+user.id+'/invite-family', {phone:inviteePhone})).data;
+        console.log(result)
+      } catch (error) {
+        setApiError('an error occured');
+        console.log('Error during the post: ', error.response.data.error);
+        console.log('Server status: ',error.response.status);
+        // console.log("error: ",error.response.data.error);
+      }
+      setShow(false);
+    }
   }
 
   const family = JSON.parse(navigation.state.params.familyObj);
-  console.log('Family name: ', family.family_name);
+  // console.log('Family name: ', family.family_name);
+
   const putModal = () => {
     return(
       <Modal animationType={"slide"} transparent={true} visible={show} onRequestClose={() => setShow(false) }>
         <View style = {styles.modalwrap}>
           <View style = {styles.modal}>
-            <Text style={{ color: 'black' }}>Add Email</Text>
+            <Text style={{ color: 'black' }}>Add phone number</Text>
             <TextInput
-              value={email}
-              onChangeText={e => setEmail(e)}
-              placeholder={'Email Address'}
-              keyboardType='email-address'
+              value={inviteePhone}
+              onChangeText={e => setInviteePhone(e)}
+              placeholder={'Phone number'}
+              keyboardType='phone-pad'
               style={{ width: '100%', borderColor: '#aaa', borderWidth: 1, marginBottom: 15, borderRadius: 6, marginTop: 5 }}
             />
             <TouchableOpacity onPress={() => sendInvitation()} style={styles.sendbtn}>
               <Text style={{ color: 'white' }}>Send Invitation</Text>
             </TouchableOpacity>
+            {apiError ? <Text style={{marginTop:5, alignSelf:'center', color:'red'}}>{apiError}</Text>: null}
           </View>
         </View>
       </Modal>
@@ -69,7 +85,9 @@ export default function ViewFamily(){
                   <Text numberOfLines={1} style={{ marginLeft: 6, fontSize: 17, color: 'black' }}>Lucas</Text>
                 </View>
                 <View style={{ width: '80%', alignItems: 'center', justifyContent: 'flex-end', alignSelf: 'center', marginTop: 10, flexDirection: 'row' }}>
-                  <TouchableOpacity style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#15B715', justifyContent: 'center', alignItems: 'center' }}>
+                  <TouchableOpacity
+                    onPress={() => navigation.push("UserConvo")}
+                    style={{ width: 35, height: 35, borderRadius: 20, backgroundColor: '#15B715', justifyContent: 'center', alignItems: 'center' }}>
                     <Image source={require('./../../Assets/icons/chat.png')} style={styles.icon} />
                   </TouchableOpacity>
                 </View>
