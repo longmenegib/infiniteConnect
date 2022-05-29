@@ -8,20 +8,24 @@ export default function CreateFamily(){
   const navigation = useNavigation();
   const [familyName, setFamilyName] = useState('');
   const [familyAddress, setFamilyAddress] = useState('');
-  const [apiError, setApiError] = useState(null);
+  const [apiError, setApiError] = useState('');
 
   const handleCreate = async() => {
-    setApiError(false)
+    setApiError('')
     if (familyName) {
       try {
         const result= await (await axios.post(baseURL+'family-api/families/', {family_name:familyName, address:familyAddress})).data
         console.log('Query result: ', result);
         navigation.navigate('InitFamily', {familyObj: JSON.stringify(result)});
       } catch (error) {
-        setApiError(true);
+        if (error.response.status ==400) {
+          setApiError(error.response.data.error);
+        } else {
+          setApiError('an error occured')
+        }
         console.log('Error during the post: ', error.response.data.error);
         console.log('Server status: ',error.response.status);
-        // console.log("error: ",error.response.data.error);
+        console.log("error: ",error.response.data.error);
       }
     }
   }
@@ -61,7 +65,7 @@ export default function CreateFamily(){
             onChangeText={(text)=> setFamilyAddress(text)}
           />
         </View>
-        {apiError? <Text>An error occured. please, try again</Text>:null}
+        {apiError? <Text style={{margin:5, color:'red'}}>{apiError}</Text>:null}
         <TouchableOpacity onPress={() => handleCreate()} style={styles.btn}>
           <Text style={{ color: 'white', fontSize: 18 }}>Create</Text>
         </TouchableOpacity>
