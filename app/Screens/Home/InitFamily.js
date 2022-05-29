@@ -1,17 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import { baseURL } from '../../../utilis/urls';
+import { authContext } from '../../Context.js/authContext';
 
 export default function InitFamily(){
   const navigation = useNavigation();
   const [show, setShow] = useState(false);
-  const [phoneInvitee, setPhoneInvitee] = useState('');
+  const [inviteePhone, setInviteePhone] = useState('');
   const [family, setFamily] = useState(JSON.parse(navigation.state.params.familyObj))
 
-  const sendInvitation = () => {
+  const {user} = useContext(authContext);
+
+  const sendInvitation = async() => {
+    try {
+      const result = await (await axios.post(baseURL+user.id+'/invite-family', {phone:inviteePhone})).data;
+      console.log(result)
+    } catch (error) {
+      console.log('Error during the post: ', error.response.data.error);
+      console.log('Server status: ',error.response.status);
+      // console.log("error: ",error.response.data.error);
+    }
     setShow(false);
   }
-  console.log('Family: address', family.address);
+  // console.log('Family: address', family.address);
   const putModal = () => {
     return(
       <Modal animationType={"slide"} transparent={true} visible={show} onRequestClose={() => setShow(false) }>
@@ -19,8 +32,8 @@ export default function InitFamily(){
           <View style = {styles.modal}>
             <Text style={{ color: '#424242', marginBottom:5 }}>Add phone number</Text>
             <TextInput
-              value={phoneInvitee}
-              onChangeText={e => setPhoneInvitee(e)}
+              value={inviteePhone}
+              onChangeText={e => setInviteePhone(e)}
               placeholder={'Phone number'}
               keyboardType='phone-pad'
               multiline
@@ -64,6 +77,9 @@ export default function InitFamily(){
         </View>
         <TouchableOpacity onPress={() => setShow(true)} style={styles.sendbtn}>
           <Text style={{ color: 'white', fontSize: 17 }}>Invite a member</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("MyFamily")} style={styles.sendbtn}>
+          <Text style={{ color: 'white', fontSize: 17 }}>Do it later</Text>
         </TouchableOpacity>
       </View>
       {putModal()}
@@ -122,7 +138,7 @@ const styles = StyleSheet.create({
   sendbtn: {
     width: '90%',
     alignSelf: 'center',
-    marginBottom: 70,
+    marginBottom: 35,
     height: 56,
     backgroundColor: '#15B715',
     alignItems: 'center',
