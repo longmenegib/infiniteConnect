@@ -25,7 +25,8 @@ export default function UserSignIn(){
         
         const apiPoint= `${baseURL}user-api/kids/${result.kid.id}/`;
         // console.log("Api point: ", apiPoint);
-        const userData = await (await axios.get(apiPoint, {headers: {"Authorization":`Token ${result.token}`}})).data;
+        axios.defaults.headers.common['Authorization'] = `Token ${result.token}`; //sets the token for the first connection
+        const userData = await (await axios.get(apiPoint)).data;
         // console.log('User informations: ', userData);
         await setUser(userData);
         // console.log("User: ", result.kid)
