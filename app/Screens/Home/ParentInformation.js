@@ -1,10 +1,29 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import { baseURL } from '../../../utilis/urls';
+import { authContext } from '../../Context.js/authContext';
 
 export default function ParentInformation(){
   const navigation = useNavigation();
+  const [parents, setParents] = useState({})
+  const {user} = useContext(authContext);
+  
+  const getParent = async() => {
+    try {
+      const result = await (await axios.get(baseURL+'user-api/parent-infos/'+user.id +'/')).data;
+      console.log("result", result)
+    } catch (error) {
+      console.log('Error during the post: ', error.response.data.error);
+      console.log('Server status: ',error.response.status);
+      console.log("error: ",error.response.data.error);
+    }
+  }
 
+  useEffect(() => {
+    getParent()
+  }, [])
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
       <View style={styles.header}>
