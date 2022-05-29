@@ -29,7 +29,7 @@ export default function MyFamily(){
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10 }}>
           <Image source={require('./../../Assets/icons/back.png')} style={styles.back} />
         </TouchableOpacity>
-        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center' }}>
+        {/* <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center' }}>
           <TouchableOpacity style={styles.btn}>
             <Text style={{ color: 'white' }}>Filter</Text>
           </TouchableOpacity>
@@ -39,16 +39,16 @@ export default function MyFamily(){
           <TouchableOpacity style={styles.sbtn}>
             <Text style={styles.stxt}>Near You</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
       <ScrollView style={styles.body}>
         {families.map((family, i) => {
           return(
             <TouchableOpacity onPress={() => navigation.navigate('ViewFamily', {familyObj: JSON.stringify(family)})} style={styles.family}>
               <Image source={require('./../../Assets/family.jpg')} style={styles.img} />
-              <TouchableOpacity style={styles.likebtn}>
+              {/* <TouchableOpacity style={styles.likebtn}>
                 <Image style={styles.heart} source={i%2? require('./../../Assets/icons/heart.png'): require('./../../Assets/icons/heartd.png')} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>{family.family_name}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
