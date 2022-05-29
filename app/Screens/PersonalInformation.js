@@ -1,12 +1,15 @@
 import React, { useContext, useState } from 'react';
-import { View, ImageBackground, Image, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, ImageBackground, Image, Text, StyleSheet, Modal, TouchableOpacity, Platform } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { authContext } from '../Context.js/authContext';
+import ImagePicker from 'react-native-image-crop-picker';
+
 
 export default function PersonalInformation(){
   const navigation = useNavigation();
   const [rend, setRend] = useState(1);
   const [show, setShow] = useState(false);
+  const [image, setImage]= useState(null);
   const {user} = useContext(authContext);
 
   const putbtnStyle = (e) => {
@@ -22,6 +25,24 @@ export default function PersonalInformation(){
       return { color: 'white', fontWeight: 'bold' }
     }
   }
+
+  const updateProfilePic = () => {
+   console.log('Updating profile pic...') 
+  }
+
+  const choosePhotoFromLibrary = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: true,
+      compressImageQuality: 0.8,
+    }).then((image) => {
+      console.log(image);
+      const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
+      setImage(imageUri);
+      this.bs.current.snapTo(1);
+    });
+  };
 
   const putModal = () => {
     return(
@@ -54,15 +75,28 @@ export default function PersonalInformation(){
           </TouchableOpacity>
         </View>
         <View style={styles.row}>
-          <View style={styles.pic}>
-            <Image source={require('./../Assets/icons/camera.png')} style={styles.img} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 35 }}>
+          <TouchableOpacity onPress={choosePhotoFromLibrary} style={styles.pic}>
+            <Image source={image? {uri:image}: require('./../Assets/icons/camera.png')} style={{ width: 100, height:100 }} />
+          </TouchableOpacity>
+          <View style={{ width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: '#28A7E3', marginTop: 60, marginLeft: -50 }}>
+            <Image source={require('./../Assets/icons/wedit.png')} style={styles.back} />
           </View>
+        </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'black' }}>{user?.first_name +'  '+ user?.last_name}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'black', marginLeft:10 }}>{user?.first_name? user.first_name:'No' +'  '+ user?.last_name? user?.last_name:'Name'}</Text>
             {/* <Text style={{ fontSize: 16, color: '#424242' }}>Buea, Santa</Text>
             <Text style={{ color: '#999999' }}>This is the biography of this weird dude that I don't even know or like.</Text> */}
           </View>
         </View>
+        {image ?
+        <TouchableOpacity onPress={updateProfilePic} style={{ marginTop:-20}}>
+          <View style={{alignSelf:'flex-end', backgroundColor:'#28A7E3', padding:10, borderRadius:5}}>
+              <Text style={{color:'white'}}>Confirm Profile</Text>
+          </View>
+        </TouchableOpacity>
+      :null  
+      }
         <View style={{ paddingVertical: 20, width: '100%', borderBottomColor: '#aaa', borderBottomWidth: 0.5 }}>
           <Text style={styles.label}>Gender</Text>
           <Text style={styles.val}>{user?.sex}</Text>
@@ -104,17 +138,13 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor:'gray',
     marginRight:20,
-    borderRadius:50
-  },
-  img: {
-    width: 100,
-    height: 100,
-    borderRadius: 65
+    borderRadius:50,
+    overflow:'hidden'
   },
   label: {
     fontWeight: 'bold',
     color: '#999999',
-    marginBottom: 5
+    marginBottom: 5,
   },
   val: {
     color: 'black',
@@ -148,5 +178,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 218,
     marginTop: 10
-  }
+  },
+  back: {
+    width: 20,
+    height: 20
+  },
 });
