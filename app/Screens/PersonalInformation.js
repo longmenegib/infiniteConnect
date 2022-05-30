@@ -3,6 +3,7 @@ import { View, ImageBackground, Image, Text, StyleSheet, Modal, TouchableOpacity
 import { useNavigation } from 'react-navigation-hooks';
 import { authContext } from '../Context.js/authContext';
 import ImagePicker from 'react-native-image-crop-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function PersonalInformation(){
@@ -24,6 +25,14 @@ export default function PersonalInformation(){
     if(e == rend){
       return { color: 'white', fontWeight: 'bold' }
     }
+  }
+
+  const onSignOut = async() => {
+    await Promise.all([
+      AsyncStorage.removeItem('userToken'),
+      AsyncStorage.removeItem('userId'),
+    ]);
+    navigation.navigate('UserSignIn');
   }
 
   const updateProfilePic = () => {
@@ -108,6 +117,11 @@ export default function PersonalInformation(){
           <Text style={styles.label}>E-mail</Text>
           <Text style={styles.val}>{user?.email ? user.email:"No email"}</Text>
         </View>
+        <TouchableOpacity onPress={onSignOut} style={{ marginTop:20}}>
+          <View style={{alignSelf:'flex-end', backgroundColor:'#28A7E3', paddingVertical:10, paddingHorizontal:20, borderRadius:5}}>
+              <Text style={{color:'white'}}>log out</Text>
+          </View>
+        </TouchableOpacity>
       </View>
       {putModal()}
     </ImageBackground>

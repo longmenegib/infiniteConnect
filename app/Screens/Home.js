@@ -32,7 +32,7 @@ export default function Home(){
             <View style={styles.circle}>
               <Image source={require('./../Assets/icons/story.png')} style={styles.icon} />
             </View>
-            <Text style={styles.txt}>My life story</Text>
+            <Text style={styles.txt}>Personal informations</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Resources')} style={styles.rect}>
             <View style={styles.circle}>
@@ -49,6 +49,7 @@ export default function Home(){
 const styles = StyleSheet.create({
   main: {
     flex: 1,
+    justifyContent:'center'
   },
   input: {
     width: '100%',

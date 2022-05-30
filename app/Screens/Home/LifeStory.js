@@ -44,12 +44,12 @@ export default function LifeStory(){
           <Image source={require('./../../Assets/icons/back.png')} style={styles.back} />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', marginLeft: -20 }}>
-          <Text style={{ color: '#000000' }}>My life story</Text>
+          <Text style={{ color: '#000000' }}>Personal informations</Text>
         </View>
       </View>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setRend(1)} style={putbtnStyle(1)}>
-          <Text style={putxtStyle(1)}>Profile</Text>
+          <Text style={putxtStyle(1)}>Life story</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => [setRend(2), setShowModal(true)]} style={putbtnStyle(2)}>
           <Text style={putxtStyle(2)}>Parents informations</Text>
