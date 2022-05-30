@@ -12,7 +12,7 @@ export default function ParentInformation(){
   
   const getParent = async() => {
     try {
-      const result = await (await axios.get(baseURL+'user-api/parent-infos/'+user.id +'/')).data;
+      const result = await (await axios.get(baseURL+'user-api/parent-infos/')).data;
       console.log("result", result)
     } catch (error) {
       console.log('Error during the post: ', error.response.data.error);

@@ -9,6 +9,13 @@ export default function Home(){
   return(
     <ImageBackground source={require('./../Assets/bg.png')} style={styles.main}>
       <StatusBar backgroundColor="#911" barStyle="light-content" />
+      <View style={{alignItems:'flex-end', marginTop:5}}>
+        <TouchableOpacity>
+          <View style={{borderColor:'#28A7E3', borderWidth:2, borderRadius:100, marginHorizontal:5}}>
+            <Image source={require('../Assets/pics/bell.png')} style={styles.notif} />
+          </View>
+        </TouchableOpacity>
+      </View>
       <View style={styles.header}>
         <TextInput placeholder='Search family...' style={styles.input} />
       </View>
@@ -49,19 +56,28 @@ export default function Home(){
 const styles = StyleSheet.create({
   main: {
     flex: 1,
+    justifyContent:'center',
+    height:600
+  },
+  header: {
+    flexDirection:'row',
+    padding: 10,
+    paddingTop: 20,
+    alignItems:'center',
     justifyContent:'center'
   },
   input: {
-    width: '100%',
+    width: '85%',
     backgroundColor: 'rgba(0,0,360, 0.1)',
     borderRadius: 218,
     height: 45,
     paddingLeft: 25,
     opacity: 0.7
   },
-  header: {
-    padding: 10,
-    paddingTop: 20
+  notif: {
+    height:36,
+    width:36,
+    resizeMode:'contain'
   },
   body: {
     flex: 1,

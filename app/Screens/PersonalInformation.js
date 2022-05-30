@@ -80,7 +80,7 @@ export default function PersonalInformation(){
             <Text style={putxtStyle(1)}>Profile</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => [setRend(2), setShow(true)]} style={putbtnStyle(2)}>
-            <Text style={putxtStyle(2)}>Personal informations</Text>
+            <Text style={putxtStyle(2)}>Life Story</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.row}>
@@ -117,7 +117,7 @@ export default function PersonalInformation(){
           <Text style={styles.label}>E-mail</Text>
           <Text style={styles.val}>{user?.email ? user.email:"No email"}</Text>
         </View>
-        <TouchableOpacity onPress={onSignOut} style={{ marginTop:20}}>
+        <TouchableOpacity onPress={onSignOut} style={{ marginTop:20, alignSelf:'flex-start'}}>
           <View style={{alignSelf:'flex-end', backgroundColor:'#28A7E3', paddingVertical:10, paddingHorizontal:20, borderRadius:5}}>
               <Text style={{color:'white'}}>log out</Text>
           </View>

@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ImageBackground } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ImageBackground, Modal } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { story } from '../../../utilis/story';
+import { authContext } from '../../Context.js/authContext';
 import ParentInformation from './ParentInformation'
 
-export default function LifeStory(){
+export default function LifeStory() {
   const navigation = useNavigation();
-  const [showModal, setShowModal] = useState(false)
-  const [rend, setRend] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [rend, setRend] = useState(2);
+  const {user} = useContext(authContext);
+
   const putbtnStyle = (e) => {
     if(e == rend){
       return { width: '50%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: '#28A7E3', borderRadius: 4 }
@@ -29,7 +32,7 @@ export default function LifeStory(){
             <Image source={require('./../../Assets/icons/danger.png')} style={{ width: 50, height: 50 }} />
             <Text style={{ fontWeight: 'bold', fontSize: 18, marginTop: 25, color: 'black' }}>Information is locked</Text>
             <Text style={{ textAlign: 'center', marginVertical: 10, width: '90%', color: '#424242' }}>The information is locked and will be available when you turn <Text style={{ fontWeight: 'bold' }} >15 years</Text> old.</Text>
-            <TouchableOpacity onPress={() => [setRend(1), setShowModal(false)]} style={styles.sendbtn}>
+            <TouchableOpacity onPress={() => [setRend(2), setShowModal(false)]} style={styles.sendbtn}>
               <Text style={{ color: 'white' }}>Go back</Text>
             </TouchableOpacity>
           </View>
@@ -48,22 +51,35 @@ export default function LifeStory(){
         </View>
       </View>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setRend(1)} style={putbtnStyle(1)}>
+        <TouchableOpacity
+          onPress={() => {
+            if(user.age <15) {
+              setShowModal(true)
+            } else {
+              setRend(1);
+            }
+          }}
+          style={putbtnStyle(1)}>
           <Text style={putxtStyle(1)}>Life story</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => [setRend(2), setShowModal(true)]} style={putbtnStyle(2)}>
+        <TouchableOpacity onPress={() => [setRend(2), setShowModal(false)]} style={putbtnStyle(2)}>
           <Text style={putxtStyle(2)}>Parents informations</Text>
         </TouchableOpacity>
       </View>    
       <ScrollView>
         {rend==1? (
-        <View style={{padding:15}}>
-          <Text style={{fontSize:17}}>{story}</Text>
-        </View>
+          <>
+            <View style={{padding:15}}>
+              <Text style={{fontSize:17}}>{story}</Text>
+            </View>
+          </>
         )
         :
         (
-        <ParentInformation/>
+          <>
+              {putModal()}
+              <ParentInformation/>
+          </>
         )  
       }
       </ScrollView>
@@ -113,5 +129,33 @@ const styles = StyleSheet.create({
   next: {
     width: 30,
     height: 30
+  },
+  modalwrap: {
+    flex: 1,
+    height: '100%',
+    backgroundColor: 'rgba(360,360,360,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  modal: {
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    borderRadius: 7,
+    paddingVertical: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '90%',
+    paddingHorizontal: 10,
+    minHeight: 200,
+    elevation: 20
+  },
+  sendbtn: {
+    width: '80%',
+    height: 35,
+    backgroundColor: '#15B715',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 218,
+    marginTop: 10
   },
 })
