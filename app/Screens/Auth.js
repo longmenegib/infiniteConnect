@@ -16,16 +16,11 @@ export default function Auth() {
   const {setUser} = useContext(authContext);
   const [token, setToken] = useState(null)
 
-  useEffect(() => {
-    if(token) {
-      axios.defaults.headers.common['Authorization'] = `Token ${token}`;
-    }
-  }, [token])
-
+  
   const _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const userId = await AsyncStorage.getItem('userId');
-    if(userToken) {setToken(userToken)};
+    if(userToken && !token) {setToken(userToken)};
     // console.log("Previous user token: ", userToken);
     // console.log("Previous user Id: ", userId);
     try {
@@ -39,7 +34,17 @@ export default function Auth() {
     }
     setTimeout(() => navigation.navigate(userToken ? 'App' : 'Auth'), 1.5*1000)
   };
+  
+  
+  useEffect(() => {
+    if(token) {
+      axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+      _bootstrapAsync()
+    }
+    console.log('User token: ', token);
+  }, [token])
 
+  
   useEffect(() => {
     _bootstrapAsync();
   }, []);
