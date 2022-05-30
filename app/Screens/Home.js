@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection:'row',
     padding: 10,
-    paddingTop: 20,
+    // paddingTop: 20,
     alignItems:'center',
     justifyContent:'center'
   },
