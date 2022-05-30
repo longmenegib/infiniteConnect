@@ -8,11 +8,11 @@ import { authContext } from '../../Context.js/authContext';
 
 export default function UserSignIn(){
   const navigation = useNavigation();
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [otp, setOtp] = useState('');
   const [phone, setPhone] = useState('');
   const [apiError, setApiError] = useState(null);
-  const {setUser} = useContext(authContext)
+  const {setUser} = useContext(authContext);
   
   const handleSignIn = async() => {
     setApiError(null)
@@ -25,7 +25,8 @@ export default function UserSignIn(){
         
         const apiPoint= `${baseURL}user-api/kids/${result.kid.id}/`;
         // console.log("Api point: ", apiPoint);
-        const userData = await (await axios.get(apiPoint, {headers: {"Authorization":`Token ${result.token}`}})).data;
+        axios.defaults.headers.common['Authorization'] = `Token ${result.token}`;
+        const userData = await (await axios.get(apiPoint)).data;
         // console.log('User informations: ', userData);
         await setUser(userData);
         // console.log("User: ", result.kid)
@@ -73,6 +74,7 @@ export default function UserSignIn(){
             onChangeText={(e) => setPhone(e)}
             placeholder='Enter your phone number'
             style={styles.input} 
+            keyboardType="phone-pad"
           />
           {apiError? <Text style={{color:'red', alignSelf:'center'}} >{apiError}</Text> : null }
           <View style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

@@ -59,8 +59,8 @@ export default function GuestSignIn(){
           <TextInput
             value={otp}
             onChangeText={e => setOtp(e.toString())}
-            placeholder='Enter your user Id'
-            keyboardType='default'
+            placeholder='Enter your invitee Id'
+            keyboardType='phone-pad'
             style={styles.input}
           />
           <TextInput
