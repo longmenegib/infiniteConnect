@@ -1,14 +1,16 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ImageBackground } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ImageBackground, Platform } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { baseURL } from '../../../utilis/urls';
+import ImagePicker from 'react-native-image-crop-picker';
 
 export default function CreateFamily(){
   const navigation = useNavigation();
   const [familyName, setFamilyName] = useState('');
   const [familyAddress, setFamilyAddress] = useState('');
   const [apiError, setApiError] = useState('');
+  const [image, setImage] = useState(null);
 
   const handleCreate = async() => {
     setApiError('')
@@ -30,6 +32,20 @@ export default function CreateFamily(){
     }
   }
 
+  const choosePhotoFromLibrary = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: true,
+      compressImageQuality: 0.8,
+    }).then((image) => {
+      console.log(image);
+      const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
+      setImage(imageUri);
+      this.bs.current.snapTo(1);
+    });
+  };
+
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
       <View style={styles.header}>
@@ -42,8 +58,8 @@ export default function CreateFamily(){
       </View>
       <View style={styles.body}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 35 }}>
-          <TouchableOpacity style={styles.pic}>
-            <Image source={require('./../../Assets/icons/camera.png')} style={{ width: 50, height: 50 }} />
+          <TouchableOpacity style={styles.pic} onPress={choosePhotoFromLibrary}>
+            <Image source={ image? {uri:image}: require('./../../Assets/icons/camera.png')} style={image?{width:100, height:100}:{ width: 50, height: 50 }} />
           </TouchableOpacity>
           <View style={{ width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: '#28A7E3', marginTop: 60, marginLeft: -25 }}>
             <Image source={require('./../../Assets/icons/wedit.png')} style={styles.back} />
@@ -102,7 +118,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: '#dddddd',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflow:'hidden'
   },
   drow: {
     marginBottom: 20,
