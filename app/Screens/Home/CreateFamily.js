@@ -1,9 +1,10 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ImageBackground, Platform } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import { baseURL } from '../../../utilis/urls';
 import ImagePicker from 'react-native-image-crop-picker';
+import { authContext } from '../../Context.js/authContext';
 
 export default function CreateFamily(){
   const navigation = useNavigation();
@@ -11,12 +12,39 @@ export default function CreateFamily(){
   const [familyAddress, setFamilyAddress] = useState('');
   const [apiError, setApiError] = useState('');
   const [image, setImage] = useState(null);
+  const {user} = useContext(authContext);
 
   const handleCreate = async() => {
-    setApiError('')
-    if (familyName) {
+    setApiError('');
+    
+    if (familyName&& familyAddress) {
+      let imgToUpload = null;
+      if (image) {
+        imgToUpload = {
+          type:'image/jpeg',
+          name:image.split('/')[image.split('/').length-1],
+          uri:image
+        }
+      }
+
+      const toTransfer = new FormData();
+      toTransfer.append('family_name', familyName);
+      toTransfer.append('address', familyAddress);
+      toTransfer.append('image', imgToUpload);
       try {
-        const result= await (await axios.post(baseURL+'family-api/families/', {family_name:familyName, address:familyAddress})).data
+        console.log('Image: ', image)
+        let result= await (await axios.post(baseURL+'family-api/families/',
+          toTransfer,
+          {
+            headers:{'Content-Type':'multipart/form-data'},
+            transformRequest:(data, headers) => {
+              return toTransfer;
+            }
+          }  
+          )).data
+        // if (image) {
+        //   await axios.put(baseURL+`family-api/families/${result.id}/`, {image:image});
+        // }
         console.log('Query result: ', result);
         navigation.navigate('InitFamily', {familyObj: JSON.stringify(result)});
       } catch (error) {
@@ -27,7 +55,7 @@ export default function CreateFamily(){
         }
         console.log('Error during the post: ', error.response.data.error);
         console.log('Server status: ',error.response.status);
-        console.log("error: ",error.response.data.error);
+        console.log("error: ",error.message);
       }
     }
   }
@@ -42,7 +70,6 @@ export default function CreateFamily(){
       console.log(image);
       const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
       setImage(imageUri);
-      this.bs.current.snapTo(1);
     });
   };
 
