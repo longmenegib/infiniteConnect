@@ -4,6 +4,8 @@ import { useNavigation } from 'react-navigation-hooks';
 import { authContext } from '../Context.js/authContext';
 import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { baseURL } from '../../utilis/urls';
 
 
 export default function PersonalInformation(){
@@ -35,8 +37,32 @@ export default function PersonalInformation(){
     navigation.navigate('UserSignIn');
   }
 
-  const updateProfilePic = () => {
-   console.log('Updating profile pic...') 
+  const updateProfilePic = async () => {
+    const toTransfer = new FormData();
+    const imgToUpload = {
+      type:'image/jpeg',
+      name:image.split('/')[image.split('/').length-1],
+      uri:image
+    }
+
+    // toTransfer.append('username', user.user)
+
+    toTransfer.append('image', imgToUpload)
+    try {
+    const result = await (await axios.put(baseURL+'user-api/users/'+ user.id+'/', toTransfer, 
+    {
+      headers:{'Content-Type':'multipart/form-data'},
+      transformRequest:(data, headers) => {
+        return toTransfer;
+      }
+    }  
+    )).data
+    console.log('result: ', result);
+  } catch (error) {
+    console.log("Error during image update: ",error.response.data);
+    console.log("Error during image update status ",error.response.status);
+    console.log("error: ",error.message);
+  }
   }
 
   const choosePhotoFromLibrary = () => {
@@ -49,7 +75,6 @@ export default function PersonalInformation(){
       console.log(image);
       const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
       setImage(imageUri);
-      this.bs.current.snapTo(1);
     });
   };
 
