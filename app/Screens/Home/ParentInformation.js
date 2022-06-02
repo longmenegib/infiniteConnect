@@ -8,17 +8,20 @@ import { authContext } from '../../Context.js/authContext';
 export default function ParentInformation(){
   const navigation = useNavigation();
   const [parents, setParents] = useState({})
+  const [loading, setLoading] = useState(false)
   const {user} = useContext(authContext);
   
   const getParent = async() => {
+    setLoading(true)
     try {
-      const result = await (await axios.get(baseURL+'user-api/parent-infos/')).data;
-      console.log("result", result)
+      const result = await (await axios.get(baseURL+'user-api/parent-infos/')).data; 
+      setParents(result.results[0])
     } catch (error) {
       console.log('Error during the post: ', error.response.data.error);
       console.log('Server status: ',error.response.status);
       console.log("error: ",error.response.data.error);
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -38,25 +41,25 @@ export default function ParentInformation(){
         <View>
           <View style={styles.row}>
             <Text style={styles.label}>Father's Name</Text>
-            <Text style={styles.val}>Martin Thiery Atangana</Text>
+            <Text style={styles.val}>{!loading && (parents?.father_name||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Date of birth</Text>
-            <Text style={styles.val}>01/02/1995</Text>
+            <Text style={styles.val}>{!loading&&(parents?.father_name||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Location</Text>
-            <Text style={styles.val}>Douala</Text>
+            <Text style={styles.val}>{!loading&&(parents?.father_address||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Profession</Text>
-            <Text style={styles.val}>Web designer</Text>
+            <Text style={styles.val}>{!loading&&(parents?.father_profession||'Unknown')}</Text>
           </View>
         </View>
         <View style={{ marginTop: 60 }}>
           <View style={styles.row}>
             <Text style={styles.label}>Mother's Name</Text>
-            <Text style={styles.val}>Raisa Marie Biloa</Text>
+            <Text style={styles.val}>{!loading&&(parents?.mother_name||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Date of birth</Text>
@@ -64,11 +67,11 @@ export default function ParentInformation(){
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Location</Text>
-            <Text style={styles.val}>Douala</Text>
+            <Text style={styles.val}>{!loading&&(parents?.mother_address||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Profession</Text>
-            <Text style={styles.val}>Teacher</Text>
+            <Text style={styles.val}>{!loading&&(parents?.mother_profession||'Unknown')}</Text>
           </View>
         </View>
       </ScrollView>

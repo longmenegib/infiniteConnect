@@ -37,19 +37,19 @@ export default function PersonalInformation(){
     navigation.navigate('UserSignIn');
   }
 
-  const updateProfilePic = async () => {
+  const updateProfilePic = async (imgPath) => {
     const toTransfer = new FormData();
     const imgToUpload = {
       type:'image/jpeg',
-      name:image.split('/')[image.split('/').length-1],
-      uri:image
+      name:imgPath.split('/')[imgPath.split('/').length-1],
+      uri:imgPath
     }
 
     // toTransfer.append('username', user.user)
 
     toTransfer.append('image', imgToUpload)
     try {
-    const result = await (await axios.put(baseURL+'user-api/users/'+ user.id+'/', toTransfer, 
+    const result = await (await axios.patch(baseURL+'user-api/users/'+ user.user_id+'/', toTransfer, 
     {
       headers:{'Content-Type':'multipart/form-data'},
       transformRequest:(data, headers) => {
@@ -58,6 +58,7 @@ export default function PersonalInformation(){
     }  
     )).data
     console.log('result: ', result);
+    setImage(imgPath)
   } catch (error) {
     console.log("Error during image update: ",error.response.data);
     console.log("Error during image update status ",error.response.status);
@@ -74,7 +75,7 @@ export default function PersonalInformation(){
     }).then((image) => {
       console.log(image);
       const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-      setImage(imageUri);
+      updateProfilePic(imageUri);
     });
   };
 
@@ -111,7 +112,7 @@ export default function PersonalInformation(){
         <View style={styles.row}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 35 }}>
           <TouchableOpacity onPress={choosePhotoFromLibrary} style={styles.pic}>
-            <Image source={image? {uri:image}: require('./../Assets/icons/camera.png')} style={{ width: 100, height:100 }} />
+            <Image source={image? {uri:image}: (user.image&&{uri:user.image} ||require('./../Assets/icons/camera.png'))} style={{ width: 100, height:100 }} />
           </TouchableOpacity>
           <View style={{ width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: '#28A7E3', marginTop: 60, marginLeft: -50 }}>
             <Image source={require('./../Assets/icons/wedit.png')} style={styles.back} />
@@ -123,14 +124,14 @@ export default function PersonalInformation(){
             <Text style={{ color: '#999999' }}>This is the biography of this weird dude that I don't even know or like.</Text> */}
           </View>
         </View>
-        {image ?
+        {/* {image ?
         <TouchableOpacity onPress={updateProfilePic} style={{ marginTop:-20}}>
           <View style={{alignSelf:'flex-end', backgroundColor:'#28A7E3', padding:10, borderRadius:5}}>
               <Text style={{color:'white'}}>Confirm Profile</Text>
           </View>
         </TouchableOpacity>
       :null  
-      }
+      } */}
         <View style={{ paddingVertical: 20, width: '100%', borderBottomColor: '#aaa', borderBottomWidth: 0.5 }}>
           <Text style={styles.label}>Gender</Text>
           <Text style={styles.val}>{user?.sex}</Text>

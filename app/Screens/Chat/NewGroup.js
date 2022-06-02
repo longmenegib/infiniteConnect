@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
+import DropDownPicker from 'react-native-dropdown-picker';
+
 
 export default function NewGroupChat(){
   const navigation = useNavigation();
+  const [dropOpen, setDropOpen] = useState(false);
+  const [dropValue, setDropValue] = useState([]);
+
+  const familyMem = [
+    {label:'jean', value:'+2376000000', id:'0'},
+    {label:'jean1', value:'+2376003700', id:'12'},
+    {label:'jean2', value:'+2376009000', id:'3'},
+    {label:'jean3', value:'+2376006000', id:'54'},
+    {label:'jean4', value:'+2376004000', id:'65'},
+    {label:'jean5', value:'+2376000900', id:'64'},
+    {label:'jean6', value:'+2376000800', id:'65'},
+    {label:'jean7', value:'+2376000500', id:'07'},
+    {label:'jean8', value:'+2376000000', id:'70'}
+  ]
+  const [dropItems, setDropItems] = useState(familyMem);
 
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
@@ -32,12 +49,25 @@ export default function NewGroupChat(){
           />
         </View>
         <View style={styles.drow}>
-          <Text style={{ color: '#424242' }}>Add e-mail</Text>
-          <TextInput placeholder="add email" style={styles.textarea} />
+          <Text style={{ color: '#424242' }}>Add phone</Text>
+          <TextInput keyboardType='phone-pad' placeholder="phone number" style={styles.phonearea} />
         </View>
-        <TouchableOpacity onPress={() => handleCreate()} style={styles.btn}>
+        {/* <TouchableOpacity onPress={() => handleCreate()} style={styles.btn}>
           <Text style={{ color: 'white', fontSize: 18 }}>Add Member</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <DropDownPicker
+          multiple={true}
+          min={0}
+          max={5}
+          placeholder="Select family members"
+          items={dropItems}
+          // value={dropValue}
+          open={dropOpen}
+          setOpen={setDropOpen}
+          setItems={setDropItems}
+          // style={{width:'85%', alignSelf:'center'}}
+          containerStyle={{width:'85%'}}
+        />
         <TouchableOpacity style={styles.crtbtn}>
           <Text style={{ color: 'white', fontSize: 18 }}>Create Group</Text>
         </TouchableOpacity>
@@ -109,11 +139,12 @@ const styles = StyleSheet.create({
     borderRadius: 218,
     marginTop: 30
   },
-  textarea: {
-    height: 100,
+  phonearea: {
+    // height: 100,
     color: 'green',
-    textAlignVertical: 'top',
-    padding: 6,
+    // textAlignVertical: 'top',
+    paddingLeft: 15,
+    paddingVertical:7,
     alignItems: 'flex-start',
     width: '100%',
     borderColor: '#15B715',

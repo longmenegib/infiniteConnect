@@ -29,7 +29,7 @@ export default function ViewFamily(){
   }
 
   const family = JSON.parse(navigation.state.params.familyObj);
-  // console.log('Family name: ', family.family_name);
+  console.log('Family ', family);
 
   const putModal = () => {
     return(
@@ -67,7 +67,7 @@ export default function ViewFamily(){
       <ScrollView style={[styles.main, { paddingTop: 20 }]}>
         <StatusBar hidden={true} />
         <View style={styles.top}>
-          <Image source={require('./../../Assets/family.jpg')} style={styles.img} />
+          <Image source={family.image? {uri:family.image} : require('./../../Assets/family.jpg')} style={styles.img} />
           <View style={styles.info}>
             <Text numberOfLines={1} style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>{family.family_name}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
@@ -129,7 +129,8 @@ const styles = StyleSheet.create({
   img: {
     width: '100%',
     height: 130,
-    borderRadius: 20
+    borderRadius: 20,
+    resizeMode:'contain'
   },
   info: {
     width: '60%',
