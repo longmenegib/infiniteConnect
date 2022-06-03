@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import DropDownPicker from 'react-native-dropdown-picker';
+import Picker from '../../Components/Picker';
 
 
 export default function NewGroupChat(){
@@ -10,18 +11,32 @@ export default function NewGroupChat(){
   const [dropValue, setDropValue] = useState([]);
 
   const familyMem = [
-    {label:'jean', value:'+2376000000', id:'0'},
-    {label:'jean1', value:'+2376003700', id:'12'},
-    {label:'jean2', value:'+2376009000', id:'3'},
-    {label:'jean3', value:'+2376006000', id:'54'},
-    {label:'jean4', value:'+2376004000', id:'65'},
-    {label:'jean5', value:'+2376000900', id:'64'},
-    {label:'jean6', value:'+2376000800', id:'65'},
-    {label:'jean7', value:'+2376000500', id:'07'},
-    {label:'jean8', value:'+2376000000', id:'70'}
+    {label:'jean', value:'+23760000001', id:'0'},
+    {label:'jean1', value:'+23760037002', id:'12'},
+    {label:'jean2', value:'+23760090003', id:'3'},
+    {label:'jean3', value:'+23760060004', id:'54'},
+    {label:'jean4', value:'+23760040005', id:'65'},
+    {label:'jean5', value:'+23760009006', id:'64'},
+    {label:'jean6', value:'+23760008007', id:'65'},
+    {label:'jean7', value:'+23760005008', id:'07'},
+    {label:'jean8', value:'+23769000009', id:'70'}
   ]
   const [dropItems, setDropItems] = useState(familyMem);
 
+  let pickerItems = [
+    {label: 'Spain', value: 'spain'},
+    {label: 'Madrid', value: 'madrid'},
+    {label: 'Barcelona', value: 'barcelona'},
+
+    {label: 'Italy', value: 'italy'},
+    {label: 'Rome', value: 'rome'},
+
+    {label: 'Finland', value: 'finland'}
+  ];
+  
+  const ImgUrl = 'https://firebasestorage.googleapis.com/v0/b/memebit-x.appspot.com/o/photos%2Fmeme-troll-face.png?alt=media&token=b0e1c29a-8fc0-4729-a244-f05e5d1e331a';
+  // pickerItems = pickerItems.map(item => {item.image = ImgUrl; return item})
+  const initialValue = ['italy', 'spain', 'barcelona', 'finland'];
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
       <View style={styles.header}>
@@ -55,18 +70,24 @@ export default function NewGroupChat(){
         {/* <TouchableOpacity onPress={() => handleCreate()} style={styles.btn}>
           <Text style={{ color: 'white', fontSize: 18 }}>Add Member</Text>
         </TouchableOpacity> */}
-        <DropDownPicker
+        {/* <DropDownPicker
           multiple={true}
           min={0}
           max={5}
-          placeholder="Select family members"
-          items={dropItems}
-          // value={dropValue}
           open={dropOpen}
           setOpen={setDropOpen}
-          setItems={setDropItems}
-          // style={{width:'85%', alignSelf:'center'}}
+          placeholder="Select family members"
+          items={dropItems}
+          value={dropValue}
+          setValue={setDropValue}
           containerStyle={{width:'85%'}}
+          onSelectItem={(valueArr) => setDropValue(valueArr)}
+          maxHeight={200}
+          // onChangeValue={(value) => setDropValue(value)}
+        /> */}
+        <Picker
+          pickerItems={pickerItems}
+          initialValue={initialValue}
         />
         <TouchableOpacity style={styles.crtbtn}>
           <Text style={{ color: 'white', fontSize: 18 }}>Create Group</Text>
