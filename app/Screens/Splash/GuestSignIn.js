@@ -8,6 +8,7 @@ import { authContext } from '../../Context.js/authContext';
 
 export default function GuestSignIn(){
   const navigation = useNavigation();
+  const [name, setName] = useState('');
   const [otp, setOtp] = useState('');
   const [phone, setPhone] = useState(null);
   const [apiError, setApiError] = useState(null);
@@ -19,17 +20,23 @@ export default function GuestSignIn(){
       console.log('Starting verification...');
       console.log('Otp: ', otp, 'Phone: ', phone)
       try{
-        const {result} = await (await axios.post(baseURL + 'user-api/verify/family-member', {otp, phone} )).data;
-        console.log("Kid registration data: ",result);
-        await setUser(result.kid);
-        // console.log("User: ", result.kid)
+        const {result} = await (await axios.post(baseURL + 'user-api/verify/family-member', {otp, phone, name} )).data;
+        console.log("Parent registration data: ",result);
+        
+        const apiPoint= `${baseURL}user-api/users/${result.user_data.id}/`;
+        console.log("Api point: ", apiPoint);
+        axios.defaults.headers.common['Authorization'] = `Token ${result.token}`;
+        const userData = await (await axios.get(apiPoint)).data;
+        // console.log('User informations: ', userData);
+        await setUser(userData);
+        // console.log("User: ", result.parent)
         // console.log('User token: ', result.token)
-        // if (remember) {
-        //   await Promise.all([
-        //     AsyncStorage.setItem('userId', JSON.stringify(result.kid.id)),
-        //     AsyncStorage.setItem('userToken', result.token),
-        //   ]);
-        // }
+        if (true) {
+          await Promise.all([
+            AsyncStorage.setItem('userId', JSON.stringify(result.user_data.id)),
+            AsyncStorage.setItem('userToken', result.token),
+          ]);
+        }
         navigation.navigate("GuestMore");
       } catch (error) {
         // console.log("Error during verification: ",JSON.stringify(error))
@@ -43,6 +50,7 @@ export default function GuestSignIn(){
       setApiError('phone and id numbers must not be empty')
     }
   }
+
 
   return(
     <View style={styles.main}>
@@ -58,7 +66,7 @@ export default function GuestSignIn(){
         <View style={styles.section}>
           <TextInput
             value={otp}
-            onChangeText={e => setOtp(e.toString())}
+            onChangeText={text => setOtp(text)}
             placeholder='Enter your invitee Id'
             keyboardType='phone-pad'
             style={styles.input}
@@ -68,6 +76,12 @@ export default function GuestSignIn(){
             onChangeText={e => setPhone(e)}
             placeholder='Enter your phone number'
             keyboardType='phone-pad'
+            style={styles.input}
+          />
+          <TextInput
+            value={name}
+            onChangeText={text => setName(text)}
+            placeholder='Enter your name'
             style={styles.input}
           />
           {apiError? <Text style={{color:'red', alignSelf:'center'}} >{apiError}</Text> : null }
