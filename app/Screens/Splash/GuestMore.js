@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ImageBackground, Platform } from 'react-native';
 import { useNavigation } from 'react-navigation-hooks';
 import ImagePicker from 'react-native-image-crop-picker';
+import { authContext } from '../../Context.js/authContext';
+import axios from 'axios';
+import { baseURL } from '../../../utilis/urls';
 
 
 export default function GuestMore(){
     const [image, setImage] = useState(null);
     const [username, setUsername] = useState('');
     const navigation = useNavigation();
-
-    const handleCreate = () => {
-        navigation.navigate('Home');
-    }
+    const {user} = useContext(authContext);
 
     const choosePhotoFromLibrary = () => {
         ImagePicker.openPicker({
@@ -23,9 +23,39 @@ export default function GuestMore(){
           console.log(image);
           const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
           setImage(imageUri);
-          this.bs.current.snapTo(1);
         });
       };
+
+      const handleConfirm = async () => {
+        let imgToUpload = null;
+        if (image) {
+          imgToUpload = {
+            type:'image/jpeg',
+            name:image.split('/')[image.split('/').length-1],
+            uri:image
+          }
+        }
+
+        const toTransfer = new FormData();
+        toTransfer.append('image',imgToUpload);
+
+        try {
+          const result = await (await axios.patch(baseURL+'user-api/users/'+ user.id+'/', toTransfer, 
+          {
+            headers:{'Content-Type':'multipart/form-data'},
+            transformRequest:(data, headers) => {
+              return toTransfer;
+            }
+          }  
+          )).data
+          console.log('Image update result: ', result);
+          navigation.navigate("UserConvo");
+        } catch (error) {
+          console.log("Error during image update: ",error.response.data);
+          console.log("Error during image update status ",error.response.status);
+          console.log("error: ",error.message);
+        }
+      }
 
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
@@ -34,10 +64,12 @@ export default function GuestMore(){
           <Image source={require('./../../Assets/icons/back.png')} style={styles.back} />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', marginLeft: -20 }}>
-          <Text style={{ color: 'black' }}>Create a family</Text>
         </View>
       </View>
       <View style={styles.body}>
+        <Text style={{fontSize:24,  marginBottom:20, fontWeight:'600'}}>
+          {user.username}
+        </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 35 }}>
           <TouchableOpacity onPress={choosePhotoFromLibrary} style={styles.pic}>
             <Image source={image? {uri:image}: require('./../../Assets/icons/camera.png')} style={{ width: image?'100%':50, height:image? '100%':50 }} />
@@ -46,21 +78,13 @@ export default function GuestMore(){
             <Image source={require('./../../Assets/icons/wedit.png')} style={styles.back} />
           </View>
         </View>
-        <View style={styles.drow}>
-          <TextInput
-            placeholder='Enter your name'
-            style={styles.input}
-            onChangeText={(text) => setUsername(text)}
-          />
-        </View>
-        {/* <View style={styles.drow}>
-          <Text style={styles.label}>Add address</Text>
-          <TextInput
-            placeholder='Address'
-            style={styles.input}
-          />
-        </View> */}
-        <TouchableOpacity onPress={() => handleSignIn()} style={[styles.confirmbtn, { marginTop: 50, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
+        {
+          !image &&
+        <Text numberOfLines={2} style={{marginHorizontal:40, textAlign:'center', color:'red'}}>
+          Choose a profile picture to help others recognize you
+        </Text>
+        }
+        <TouchableOpacity onPress={() => handleConfirm()} style={[styles.confirmbtn, { marginTop: 50, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
             <Text style={{ color: '#15B715', fontSize: 17 }}>Confirm</Text>
         </TouchableOpacity>
       </View>

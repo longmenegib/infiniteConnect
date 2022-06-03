@@ -35,6 +35,7 @@ export default function GuestSignIn(){
           await Promise.all([
             AsyncStorage.setItem('userId', JSON.stringify(result.user_data.id)),
             AsyncStorage.setItem('userToken', result.token),
+            AsyncStorage.setItem('is_family', JSON.stringify(result.user_data.is_family))
           ]);
         }
         navigation.navigate("GuestMore");

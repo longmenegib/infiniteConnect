@@ -15,24 +15,31 @@ export default function Auth() {
   const navigation = useNavigation();
   const {setUser} = useContext(authContext);
   const [token, setToken] = useState(null)
-
+  const [isFamily, setIsFamily] = useState(false);
   
   const _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const userId = await AsyncStorage.getItem('userId');
+    const is_family = await AsyncStorage.getItem('is_family');
     if(userToken && !token) {setToken(userToken)};
     // console.log("Previous user token: ", userToken);
     // console.log("Previous user Id: ", userId);
     try {
-      const apiPoint= `${baseURL}user-api/kids/${userId}/`;
+      let apiPoint;
+      if (is_family) {
+        apiPoint= `${baseURL}user-api/users/${userId}/`; //This is a family account
+      } else {
+        apiPoint= `${baseURL}user-api/kids/${userId}/`;
+      }
+
       console.log("Api point: ",apiPoint)
       const userData = await (await axios.get(apiPoint)).data;
-      // console.log('User informations: ', userData);
+      console.log('User informations: ', userData);
       setUser(userData);
     } catch (error) {
       console.log(error.response.data);
     }
-    setTimeout(() => navigation.navigate(userToken ? 'App' : 'Auth'), 1.5*1000)
+    setTimeout(() => navigation.navigate(userToken ? is_family? 'UserConvo' : 'App' : 'Auth'), 1.5*1000)
   };
   
   
