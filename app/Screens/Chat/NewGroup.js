@@ -48,10 +48,10 @@ export default function NewGroupChat(){
             style={styles.input}
           />
         </View>
-        <View style={styles.drow}>
+        {/* <View style={styles.drow}>
           <Text style={{ color: '#424242' }}>Add phone</Text>
           <TextInput keyboardType='phone-pad' placeholder="phone number" style={styles.phonearea} />
-        </View>
+        </View> */}
         {/* <TouchableOpacity onPress={() => handleCreate()} style={styles.btn}>
           <Text style={{ color: 'white', fontSize: 18 }}>Add Member</Text>
         </TouchableOpacity> */}

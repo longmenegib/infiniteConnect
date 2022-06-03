@@ -127,8 +127,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   img: {
-    width: 200,
-    height: 130,
+    width: '100%',
+    // minHeight:150,
+    height: 180,
     borderRadius: 20,
     resizeMode:'cover'
   },

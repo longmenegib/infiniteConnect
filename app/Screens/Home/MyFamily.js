@@ -49,7 +49,7 @@ export default function MyFamily(){
                 <Image source={family.image? {uri:family.image} :require('./../../Assets/family.jpg')} style={styles.img} />
                 <View style={{ flex:1,marginTop: 10, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>{family.family_name}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', margin:5 }}>
                       <Image source={require('./../../Assets/icons/location.png')} style={styles.back} />
                       <Text style={{ marginLeft: 5, color: '#424242' }}>{family.address}</Text>
                   </View>
