@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
     borderRadius:10,
     flexDirection:'row',
     alignItems:'center',
+    paddingHorizontal:16
     // elevation:1
   },
   family: {
