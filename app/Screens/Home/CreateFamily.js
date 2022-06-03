@@ -63,7 +63,7 @@ export default function CreateFamily(){
   const choosePhotoFromLibrary = () => {
     ImagePicker.openPicker({
       width: 300,
-      height: 300,
+      height: 200,
       cropping: true,
       compressImageQuality: 0.8,
     }).then((image) => {

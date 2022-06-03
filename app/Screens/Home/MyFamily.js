@@ -41,19 +41,21 @@ export default function MyFamily(){
           </TouchableOpacity>
         </View> */}
       </View>
-      <ScrollView style={styles.body}>
+      <ScrollView contentContainerStyle={{paddingVertical:20}} style={styles.body}>
         {families.map((family, i) => {
           return(
             <TouchableOpacity onPress={() => navigation.navigate('ViewFamily', {familyObj: JSON.stringify(family)})} style={styles.family}>
-              <Image source={require('./../../Assets/family.jpg')} style={styles.img} />
-              {/* <TouchableOpacity style={styles.likebtn}>
-                <Image style={styles.heart} source={i%2? require('./../../Assets/icons/heart.png'): require('./../../Assets/icons/heartd.png')} />
-              </TouchableOpacity> */}
-              <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>{family.family_name}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image source={require('./../../Assets/icons/location.png')} style={styles.back} />
-                  <Text style={{ marginLeft: 5, color: '#424242' }}>{family.address}</Text>
+              <View style={styles.familyCard}>
+                <Image source={family.image? {uri:family.image} :require('./../../Assets/family.jpg')} style={styles.img} />
+                <View style={{ flex:1,marginTop: 10, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>{family.family_name}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image source={require('./../../Assets/icons/location.png')} style={styles.back} />
+                      <Text style={{ marginLeft: 5, color: '#424242' }}>{family.address}</Text>
+                  </View>
+                </View>
+                <View style={{height:38, width:38, alignItems:'center', justifyContent:'center', backgroundColor:"#28A7E3", borderRadius:30}}>
+                  <Image source={require('../../Assets/icons/chatbubble.png')} style={styles.chatBubble} />
                 </View>
               </View>
             </TouchableOpacity>
@@ -103,20 +105,36 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: '#fdfdfd',
-    paddingTop: 30
+    // paddingTop: 30,
+    paddingBottom:60
+  },
+  familyCard:{
+    backgroundColor:"rgba(40, 167, 227, 0.1)",
+    padding:8,
+    borderRadius:10,
+    flexDirection:'row',
+    alignItems:'center',
+    // elevation:1
   },
   family: {
     paddingHorizontal: 10,
-    paddingVertical: 10,
-    marginBottom: 30
+    // paddingVertical: 10,
+    marginBottom: 20
   },
   img: {
-    width: '100%',
-    height: 170,
-    borderRadius: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 24,
     zIndex: 1,
     resizeMode: 'cover'
   },
+  chatBubble:{
+    height:27,
+    width:27,
+    resizeMode:'contain',
+    tintColor:'#fff',
+    marginLeft:-2
+  },  
   likebtn: {
     width: 40,
     height: 40,

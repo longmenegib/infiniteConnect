@@ -127,10 +127,10 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   img: {
-    width: '100%',
+    width: 200,
     height: 130,
     borderRadius: 20,
-    resizeMode:'contain'
+    resizeMode:'cover'
   },
   info: {
     width: '60%',
