@@ -33,6 +33,7 @@ export default function PersonalInformation(){
     await Promise.all([
       AsyncStorage.removeItem('userToken'),
       AsyncStorage.removeItem('userId'),
+      AsyncStorage.removeItem('is_family'),
     ]);
     navigation.navigate('UserSignIn');
   }

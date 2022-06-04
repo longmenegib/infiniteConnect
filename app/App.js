@@ -1,6 +1,6 @@
 import React from 'react';
 import { setCustomText, setCustomTextInput } from 'react-native-global-props';
-import { AsyncStorage, Image, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator, createTabNavigator } from 'react-navigation-tabs';
@@ -25,6 +25,7 @@ import ReportIssue from './Screens/Home/ReportIssue';
 import LifeStory from './Screens/Home/LifeStory';
 import ParentInformation from './Screens/Home/ParentInformation';
 import Resources from './Screens/Home/Resources';
+import ResourceView from './Screens/Home/ResourceView';
 
 import NewGroupChat from './Screens/Chat/NewGroup';
 import UserConvo from './Screens/Chat/UserConvo';
@@ -64,6 +65,7 @@ const HomeStack = createStackNavigator({
   LifeStory: LifeStory,
   ParentInformation: ParentInformation,
   Resources: Resources,
+  ResourceView:ResourceView
 },{
   defaultNavigationOptions: {
     headerShown: false

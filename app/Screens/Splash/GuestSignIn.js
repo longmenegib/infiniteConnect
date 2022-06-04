@@ -79,12 +79,12 @@ export default function GuestSignIn(){
             keyboardType='phone-pad'
             style={styles.input}
           />
-          <TextInput
+          {/* <TextInput
             value={name}
             onChangeText={text => setName(text)}
             placeholder='Enter your name'
             style={styles.input}
-          />
+          /> */}
           {apiError? <Text style={{color:'red', alignSelf:'center'}} >{apiError}</Text> : null }
           {/* <TextInput
             value={phone}

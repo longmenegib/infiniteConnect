@@ -17,27 +17,27 @@ export default function Resources(){
       </View>
       <ScrollView style={styles.body}>
         <View style={styles.section}>
-          <TouchableOpacity style={styles.btn}>
-            <Image source={require('./../../Assets/icons/cap.png')} style={styles.icon} />
+          <TouchableOpacity onPress={() => navigation.navigate("ResourceView")} style={styles.btn}>
+            <Image onPress={() => navigation.navigate("ResourceView")} source={require('./../../Assets/icons/cap.png')} style={styles.icon} />
             <Text style={styles.text}>Education</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity onPress={() => navigation.navigate("ResourceView")} style={styles.btn}>
             <Image source={require('./../../Assets/icons/house.png')} style={styles.icon} />
             <Text style={styles.text}>Housing Assistance</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity onPress={() => navigation.navigate("ResourceView")} style={styles.btn}>
             <Image source={require('./../../Assets/icons/money.png')} style={styles.icon} />
             <Text style={styles.text}>Financial Assistance</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity onPress={() => navigation.navigate("ResourceView")} style={styles.btn}>
             <Image source={require('./../../Assets/icons/case.png')} style={styles.icon} />
             <Text style={styles.text}>Medical Assistance</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity onPress={() => navigation.navigate("ResourceView")} style={styles.btn}>
             <Image source={require('./../../Assets/icons/human.png')} style={styles.icon} />
             <Text style={styles.text}>Human Services</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity onPress={() => navigation.navigate("ResourceView")} style={styles.btn}>
             <Image source={require('./../../Assets/icons/phoned.png')} style={styles.icon} />
             <Text style={styles.text}>Emergency Services</Text>
           </TouchableOpacity>

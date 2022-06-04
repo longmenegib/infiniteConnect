@@ -27,33 +27,35 @@ export default function GuestMore(){
       };
 
       const handleConfirm = async () => {
-        let imgToUpload = null;
         if (image) {
+          let imgToUpload = null;
           imgToUpload = {
             type:'image/jpeg',
             name:image.split('/')[image.split('/').length-1],
             uri:image
           }
-        }
+        
+          const toTransfer = new FormData();
+          toTransfer.append('image',imgToUpload);
 
-        const toTransfer = new FormData();
-        toTransfer.append('image',imgToUpload);
-
-        try {
-          const result = await (await axios.patch(baseURL+'user-api/users/'+ user.id+'/', toTransfer, 
-          {
-            headers:{'Content-Type':'multipart/form-data'},
-            transformRequest:(data, headers) => {
-              return toTransfer;
-            }
-          }  
-          )).data
-          console.log('Image update result: ', result);
+          try {
+            const result = await (await axios.patch(baseURL+'user-api/users/'+ user.id+'/', toTransfer, 
+            {
+              headers:{'Content-Type':'multipart/form-data'},
+              transformRequest:(data, headers) => {
+                return toTransfer;
+              }
+            }  
+            )).data
+            console.log('Image update result: ', result);
+            navigation.navigate("UserConvo");
+          } catch (error) {
+            console.log("Error during image update: ",error.response.data);
+            console.log("Error during image update status ",error.response.status);
+            console.log("error: ",error.message);
+          }
+        } else {
           navigation.navigate("UserConvo");
-        } catch (error) {
-          console.log("Error during image update: ",error.response.data);
-          console.log("Error during image update status ",error.response.status);
-          console.log("error: ",error.message);
         }
       }
 
@@ -72,17 +74,18 @@ export default function GuestMore(){
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 35 }}>
           <TouchableOpacity onPress={choosePhotoFromLibrary} style={styles.pic}>
-            <Image source={image? {uri:image}: require('./../../Assets/icons/camera.png')} style={{ width: image?'100%':50, height:image? '100%':50 }} />
+            <Image source={image? {uri:image} :user.image? {uri:user.image}: require('./../../Assets/icons/camera.png')} style={{ width: image||user.image?'100%':50, height:image||user.image? '100%':50 }} />
           </TouchableOpacity>
           <View style={{ width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: '#28A7E3', marginTop: 60, marginLeft: -25 }}>
             <Image source={require('./../../Assets/icons/wedit.png')} style={styles.back} />
           </View>
         </View>
         {
-          !image &&
+          !(image && user.image)?
         <Text numberOfLines={2} style={{marginHorizontal:40, textAlign:'center', color:'red'}}>
           Choose a profile picture to help others recognize you
         </Text>
+        :null
         }
         <TouchableOpacity onPress={() => handleConfirm()} style={[styles.confirmbtn, { marginTop: 50, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
             <Text style={{ color: '#15B715', fontSize: 17 }}>Confirm</Text>
