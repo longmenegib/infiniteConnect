@@ -1,67 +1,119 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
-import { baseURL } from '../../../utilis/urls';
-import axios from 'axios';
+import { View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Linking } from 'react-native';
+// import {ListView/}
+import axios from '../../utils/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Container, Spinner, Content, Button, Icon, List, ListItem, SwipeRow } from 'native-base';
 
-export default function MyFamily(){
-  const navigation = useNavigation();
+const datas = [
+  'Simon Mignolet',
+  'Nathaniel Clyne',
+  'Dejan Lovren',
+  'Mama Sakho',
+  'Alberto Moreno',
+  'Emre Can',
+  'Joe Allen',
+  'Phil Coutinho',
+];
+
+export default function MyFamily({navigation}){
+  // const navigation = useNavigation();
   const prevfamilies = [ 1, 2, 3, 4, 5];
   const [families, setFamilies] = useState([]);
+  const [load, setLoad] = useState(true);
+  const [selected, setSelected] = useState(null);
   
   const getFamilies = async() => {
-    try {
-      const result = await (await axios.get(baseURL+'family-api/families/')).data
-      // console.log('Result: ', result);
-      setFamilies(result.results)
-    } catch (error) {
-      console.log('Server status: ',error.response.status);
-      console.log("error: ",error.response.data.error);
-    }
+    let userToken = await AsyncStorage.getItem('userToken');
+    console.log(userToken);
+    let token = JSON.parse(userToken).result.token;
+    await axios.get('/family-api/families/', { timeout: 10000, headers: {"Authorization": `Token ${token}`} })
+      .then(async res => {
+        console.log(res.data);
+        setFamilies(res.data.results);
+        setLoad(false)
+      }).catch(err=>{
+        console.log(err.request);
+        setLoad(false)
+      })
   }
+
+  // const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
   useEffect(() => {
     getFamilies()
   }, [])
+
+  const deleteRow=(a, b, c)=>{
+
+  }
   return(
     <View style={styles.main}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ position: 'absolute', top: 10, left: 5 }}>
           <Image source={require('./../../Assets/icons/back.png')} style={styles.back} />
         </TouchableOpacity>
-        {/* <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center' }}>
-          <TouchableOpacity style={styles.btn}>
-            <Text style={{ color: 'white' }}>Filter</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sbtn}>
-            <Text style={styles.stxt}>Favorite</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sbtn}>
-            <Text style={styles.stxt}>Near You</Text>
-          </TouchableOpacity>
-        </View> */}
+        <Text style={{ fontWeight: 'bold', color: 'gray', fontSize: 18 }}>My family</Text>
       </View>
-      <ScrollView contentContainerStyle={{paddingVertical:20}} style={styles.body}>
-        {families.map((family, i) => {
-          return(
-            <TouchableOpacity onPress={() => navigation.navigate('ViewFamily', {familyObj: JSON.stringify(family)})} style={styles.family}>
-              <View style={styles.familyCard}>
-                <Image source={family.image? {uri:family.image} :require('./../../Assets/family.jpg')} style={styles.img} />
-                <View style={{ flex:1,marginTop: 10, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>{family.family_name}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', margin:5 }}>
-                      <Image source={require('./../../Assets/icons/location.png')} style={styles.back} />
-                      <Text style={{ marginLeft: 5, color: '#424242' }}>{family.address}</Text>
-                  </View>
-                </View>
-                <View style={{height:38, width:38, alignItems:'center', justifyContent:'center', backgroundColor:"#28A7E3", borderRadius:30}}>
-                  <Image source={require('../../Assets/icons/chatbubble.png')} style={styles.chatBubble} />
-                </View>
+      {load ?
+            <View style={{...styles.main, alignItems: 'center', justifyContent: 'center'}}>
+                <Spinner color="blue"/>
+            </View>
+            :
+            <>
+            {families.length<1 ?
+                <View style={{...styles.main, alignItems: 'center', justifyContent: 'center'}}>
+                <Image source={require('../../Assets/icons/error.png')} style={{ width: 70, height: 70 }} />
+                <Text style={{ marginTop: 15, fontWeight: 'bold', color: 'gray', fontSize: 18 }}>No family</Text>
+                
               </View>
-            </TouchableOpacity>
-          )
-        })}
-      </ScrollView>
+                :
+            <Content scrollEnabled={true} style={styles.body}>
+              {families.map((res, i)=>{
+                return(
+                  <SwipeRow
+                  key={i}
+                  leftOpenValue={75}
+                  left={
+                    selected===i ?
+                    <>
+                      <Spinner color="red" style={{color: '#fff'}}/>
+                    </>
+                    :
+                    <Button 
+                    style={{maxHeight: 80, padding: 0, borderBottomWidth:0, margin: 0, marginTop: 10}} danger 
+                    onPress={() => [setSelected(i)]}>
+                      <Icon active name="trash" />
+                    </Button>
+                  }
+                  style={{height: 100, padding: 0, borderBottomWidth: 0, alignSelf: 'center'}}
+                  disableLeftSwipe={true}
+                  body={
+                    <TouchableWithoutFeedback onPress={() => navigation.navigate('ViewFamily', {family: res})}>
+                    <View style={styles.familyCard}>
+                      <Image source={require('./../../Assets/family.jpg')} style={styles.img} />
+                      <View style={{ flex:1,marginTop: 10, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'sans-serif', color: 'black' }}>{res.family_name}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', margin:5 }}>
+                            <Image source={require('./../../Assets/icons/location.png')} style={styles.back} />
+                            <Text style={{ marginLeft: 5, color: '#424242' }}>{res.address}</Text>
+                        </View>
+                      </View>
+                      <View 
+                      style={{height:38, width:38, alignItems:'center', justifyContent:'center', backgroundColor:"#28A7E3", borderRadius:30}}>
+                        <Image source={require('../../Assets/icons/chatbubble.png')} style={styles.chatBubble} />
+                      </View>
+                    </View>
+                  </TouchableWithoutFeedback>
+                  }
+                />
+                )
+              })}
+              </Content>
+              }
+              </>
+          }
+      
       <TouchableOpacity onPress={() => navigation.navigate('CreateFamily')} style={styles.fab}>
         <Image source={require('./../../Assets/icons/plus.png')} style={{ width: 35, height: 35 }} />
       </TouchableOpacity>
@@ -79,7 +131,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     alignItems: 'center',
     backgroundColor: 'white',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   back: {
     width: 20,
@@ -114,13 +167,14 @@ const styles = StyleSheet.create({
     borderRadius:10,
     flexDirection:'row',
     alignItems:'center',
-    paddingHorizontal:16
+    paddingHorizontal:16,
+    maxHeight: 100
     // elevation:1
   },
   family: {
-    paddingHorizontal: 10,
+    // paddingHorizontal: 10,
     // paddingVertical: 10,
-    marginBottom: 20
+    // marginBottom: 20
   },
   img: {
     width: 60,

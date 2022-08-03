@@ -1,60 +1,59 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, StatusBar, Dimensions } from 'react-native';
+import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, StatusBar, Dimensions, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from 'react-navigation-hooks';
-import axios from 'axios';
+import axios from '../../utils/axios';
 import { baseURL } from '../../../utilis/urls';
-import { authContext } from '../../Context.js/authContext';
+import { AccessContext } from '../../context/AccessContext';
+import { Spinner } from 'native-base';
 
-export default function GuestSignIn(){
-  const navigation = useNavigation();
+export default function GuestSignIn({navigation}){
+  // const navigation = useNavigation();
   const [name, setName] = useState('');
   const [otp, setOtp] = useState('');
   const [phone, setPhone] = useState(null);
   const [apiError, setApiError] = useState(null);
-  const {setUser} = useContext(authContext);
+  const {setisLoggedIn} = useContext(AccessContext);
+  const [isSpinning, setIsSpinning] = useState(false);
 
   const handleSignIn = async() => {
+    setIsSpinning(true);
     setApiError(null)
-    if (otp && phone) {
+    if (otp && phone && name) {
       console.log('Starting verification...');
-      console.log('Otp: ', otp, 'Phone: ', phone)
-      try{
-        const {result} = await (await axios.post(baseURL + 'user-api/verify/family-member', {otp, phone, name} )).data;
-        console.log("Parent registration data: ",result);
-        
-        const apiPoint= `${baseURL}user-api/users/${result.user_data.id}/`;
-        console.log("Api point: ", apiPoint);
-        axios.defaults.headers.common['Authorization'] = `Token ${result.token}`;
-        const userData = await (await axios.get(apiPoint)).data;
-        // console.log('User informations: ', userData);
-        await setUser(userData);
-        // console.log("User: ", result.parent)
-        // console.log('User token: ', result.token)
-        if (true) {
-          await Promise.all([
-            AsyncStorage.setItem('userId', JSON.stringify(result.user_data.id)),
-            AsyncStorage.setItem('userToken', result.token),
-            AsyncStorage.setItem('is_family', JSON.stringify(result.user_data.is_family))
-          ]);
+      console.log('Otp: ', otp, 'Phone: ', phone, 'Name: ', name);
+      await axios.post('/user-api/verify/family-member', {otp:otp, phone:phone, name:name}, { withCredentials: false, timeout: 10000 })
+      .then(async res => {
+        console.log(res.data);
+        // let userit = [];
+        // // userit = [...res.data,{account_type:'kid'}];
+        // userit= res.data;
+
+        // userit.account_type = 'family';
+        // console.log(userit);
+        await AsyncStorage.setItem('userToken', JSON.stringify(res.data));
+        setisLoggedIn(true);
+        // navigation.navigate("GuessChat");
+      }).catch(err=>{
+        console.log(err.request);
+        if(err.response.status === 400){
+          setApiError(err.response.data.error)
+        }else if(err.response.status === 0){
+          Alert.alert(
+            'Error',
+            'Please check internet connection'
+          )
         }
-        navigation.navigate("GuestMore");
-      } catch (error) {
-        // console.log("Error during verification: ",JSON.stringify(error))
-        console.log(error.response.status);
-        console.log(error.response.data);
-        setApiError(error.response.data.error);
-        // console.log(error.response.headers);
-        
-      }
+      })
+      setIsSpinning(false);
     } else {
+      setIsSpinning(false);
       setApiError('phone and id numbers must not be empty')
     }
   }
 
 
   return(
-    <View style={styles.main}>
+    <ScrollView style={styles.main}>
       <StatusBar hidden={false} barStyle='dark-content' backgroundColor={'white'} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10 }}>
@@ -65,6 +64,13 @@ export default function GuestSignIn(){
         <Image style={styles.logo} source={require('./../../Assets/Logo/icone.png')} />
         <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'black' }}>Sign In</Text>
         <View style={styles.section}>
+        <TextInput
+            value={name}
+            onChangeText={text => setName(text)}
+            placeholder='Enter your username'
+            keyboardType='default'
+            style={styles.input}
+          />
           <TextInput
             value={otp}
             onChangeText={text => setOtp(text)}
@@ -93,13 +99,18 @@ export default function GuestSignIn(){
             keyboardType='phone-pad'
             style={styles.input} 
           /> */}
+          {isSpinning ? 
+            <View style={[styles.input, { marginTop: 40, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
+                <Spinner color='#15b715'/>
+            </View> : 
           <TouchableOpacity onPress={() => handleSignIn()} style={[styles.input, { marginTop: 30, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
             <Text style={{ color: '#15B715', fontSize: 17 }}>Sign In & Continue</Text>
           </TouchableOpacity>
+          }
         </View>
       </View>
       <Text style={{ padding: 10, textAlign: 'center', color: '#424242' }}>By signing in, you are agreeing to our <Text style={{ fontWeight: 'bold' }}>Terms of Use</Text> and our <Text style={{ fontWeight: 'bold' }}>Privacy Policy</Text></Text>
-    </View>
+    </ScrollView>
   )
 }
 

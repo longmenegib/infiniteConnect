@@ -1,42 +1,79 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground, TextInput } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground, TextInput, Alert } from 'react-native';
+// import { useNavigation } from 'react-navigation-hooks';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Picker from '../../Components/Picker';
+import axios from '../../utils/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Spinner, Icon} from 'native-base';
 
 
-export default function NewGroupChat(){
-  const navigation = useNavigation();
-  const [dropOpen, setDropOpen] = useState(false);
-  const [dropValue, setDropValue] = useState([]);
+export default function NewGroupChat({navigation}){
 
-  const familyMem = [
-    {label:'jean', value:'+23760000001', id:'0'},
-    {label:'jean1', value:'+23760037002', id:'12'},
-    {label:'jean2', value:'+23760090003', id:'3'},
-    {label:'jean3', value:'+23760060004', id:'54'},
-    {label:'jean4', value:'+23760040005', id:'65'},
-    {label:'jean5', value:'+23760009006', id:'64'},
-    {label:'jean6', value:'+23760008007', id:'65'},
-    {label:'jean7', value:'+23760005008', id:'07'},
-    {label:'jean8', value:'+23769000009', id:'70'}
-  ]
-  const [dropItems, setDropItems] = useState(familyMem);
+  const [open, setOpen] = useState(false);
+  const [families, setFamilies] = useState([{label: '', value: ''}]);
+  const [value, setValue] = useState([]);
+  const initialValue = [];
+  const [creating, setCreating] = useState(false);
 
-  let pickerItems = [
-    {label: 'Spain', value: 'spain'},
-    {label: 'Madrid', value: 'madrid'},
-    {label: 'Barcelona', value: 'barcelona'},
+  const [name, setName]=useState("");
 
-    {label: 'Italy', value: 'italy'},
-    {label: 'Rome', value: 'rome'},
 
-    {label: 'Finland', value: 'finland'}
-  ];
-  
-  const ImgUrl = 'https://firebasestorage.googleapis.com/v0/b/memebit-x.appspot.com/o/photos%2Fmeme-troll-face.png?alt=media&token=b0e1c29a-8fc0-4729-a244-f05e5d1e331a';
-  // pickerItems = pickerItems.map(item => {item.image = ImgUrl; return item})
-  const initialValue = ['italy', 'spain', 'barcelona', 'finland'];
+  const getFamilies = async() => {
+    let userToken = await AsyncStorage.getItem('userToken');
+    console.log(userToken);
+    let token = JSON.parse(userToken).result.token;
+    await axios.get('/user-api/kids/family-members', { timeout: 10000, headers: {"Authorization": `Token ${token}`} })
+      .then(async res => {
+        // console.log('this is my family ',res.data.family_members);
+        // setFamilies(res.data.family_members);
+        let arrfa = []
+        for (let index = 0; index < res.data.family_members.length; index++) {
+          const element = res.data.family_members[index];
+          const el = {label: element.username, value: element.username}
+          arrfa.push(el);
+        }
+        setFamilies(arrfa);
+        console.log(arrfa)
+        // setLoad(false)
+      }).catch(err=>{
+        console.log(err.request);
+      })
+  }
+
+  // const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+
+  useEffect(() => {
+    getFamilies()
+  }, [])  
+
+  const createGroup = async()=>{
+    
+    if(!name){
+      return Alert.alert("Oops","Group name is required")
+    }
+    if(value.length < 3){
+      return Alert.alert("Error","Select atleast 2 participants")
+  }
+  setCreating(true)
+    let userToken = await AsyncStorage.getItem('userToken');
+
+   
+    let token = JSON.parse(userToken).result.token;
+    let id=JSON.parse(userToken).result.kid.user
+    console.log([...value, id]);
+    // return;
+    await axios.post('/chat-api/create-chat', {participants: [...value, id], name: name}, { timeout: 10000, headers: {"Authorization": `Token ${token}`} })
+      .then(async res => {
+        console.log('Chat created', res);
+        setCreating(false)
+      }).catch(err=>{
+        console.log(err.request);
+        setCreating(false)
+      })
+  }
+
+
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
       <View style={styles.header}>
@@ -48,49 +85,56 @@ export default function NewGroupChat(){
         </View>
       </View>
       <View style={styles.body}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
           <TouchableOpacity style={styles.pic}>
             <Image source={require('./../../Assets/icons/camera.png')} style={{ width: 50, height: 50 }} />
           </TouchableOpacity>
           <View style={{ width: 25, height: 25, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: '#28A7E3', marginTop: 60, marginLeft: -25 }}>
             <Image source={require('./../../Assets/icons/wedit.png')} style={{width: 15, height: 15}} />
           </View>
-        </View>
+        </View> */}
         <View style={styles.drow}>
           <Text style={styles.label}>Name of Group</Text>
           <TextInput
             placeholder='Name of group'
             style={styles.input}
+            value={name}
+            onChangeText={(text)=> setName(text)}
           />
         </View>
-        {/* <View style={styles.drow}>
-          <Text style={{ color: '#424242' }}>Add phone</Text>
-          <TextInput keyboardType='phone-pad' placeholder="phone number" style={styles.phonearea} />
-        </View> */}
-        {/* <TouchableOpacity onPress={() => handleCreate()} style={styles.btn}>
-          <Text style={{ color: 'white', fontSize: 18 }}>Add Member</Text>
-        </TouchableOpacity> */}
-        {/* <DropDownPicker
-          multiple={true}
-          min={0}
-          max={5}
-          open={dropOpen}
-          setOpen={setDropOpen}
-          placeholder="Select family members"
-          items={dropItems}
-          value={dropValue}
-          setValue={setDropValue}
-          containerStyle={{width:'85%'}}
-          onSelectItem={(valueArr) => setDropValue(valueArr)}
-          maxHeight={200}
-          // onChangeValue={(value) => setDropValue(value)}
+        {/* <Picker
+          pickerItems={families}
+          // initialValue={[families[0]]}
         /> */}
-        <Picker
-          pickerItems={pickerItems}
-          initialValue={initialValue}
+
+        <DropDownPicker
+          open={open}
+          value={value}
+          items={families}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setFamilies}
+          // schema={{
+          //     label:'label',
+          //     value:'value',
+          //     icon:'image'
+          // }}
+          // theme="DEFAULT"
+          style={{backgroundColor:"rgba(40, 167, 227, 0.1)", borderColor:'#28A7E3'}}
+          multiple={true}
+          mode="BADGE"
+          badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926", "#00b4d8", "#e9c46a"]}
+          containerStyle={{width:'85%'}}
         />
-        <TouchableOpacity style={styles.crtbtn}>
+
+        <TouchableOpacity style={styles.crtbtn} onPress={createGroup}>
+        {creating ? 
+          <Spinner color="white"/>
+          :
           <Text style={{ color: 'white', fontSize: 18 }}>Create Group</Text>
+        }
+          
+          
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -139,7 +183,8 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomColor: '#AAAAAA',
     borderBottomWidth: 0.7,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    color: 'gray'
   },
   btn: {
     paddingHorizontal: 20,

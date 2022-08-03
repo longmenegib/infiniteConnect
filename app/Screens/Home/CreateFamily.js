@@ -1,22 +1,26 @@
 import axios from 'axios';
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ImageBackground, Platform } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+// import { useNavigation } from 'react-navigation-hooks';
 import { baseURL } from '../../../utilis/urls';
 import ImagePicker from 'react-native-image-crop-picker';
-import { authContext } from '../../Context.js/authContext';
+import { AuthContext } from '../../context/AuthContext';
 
-export default function CreateFamily(){
-  const navigation = useNavigation();
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export default function CreateFamily({navigation}){
+  // const navigation = useNavigation();
   const [familyName, setFamilyName] = useState('');
   const [familyAddress, setFamilyAddress] = useState('');
   const [apiError, setApiError] = useState('');
   const [image, setImage] = useState(null);
-  const {user} = useContext(authContext);
+  const {user} = useContext(AuthContext);
 
   const handleCreate = async() => {
     setApiError('');
-    
+    let userToken = await AsyncStorage.getItem('userToken');
+    console.log(userToken)
+    let token = JSON.parse(userToken).result.token;
     if (familyName&& familyAddress) {
       let imgToUpload = null;
       if (image) {
@@ -36,7 +40,7 @@ export default function CreateFamily(){
         let result= await (await axios.post(baseURL+'family-api/families/',
           toTransfer,
           {
-            headers:{'Content-Type':'multipart/form-data'},
+            headers:{'Content-Type':'multipart/form-data', "Authorization": `Token ${token}`},
             transformRequest:(data, headers) => {
               return toTransfer;
             }
@@ -46,16 +50,16 @@ export default function CreateFamily(){
         //   await axios.put(baseURL+`family-api/families/${result.id}/`, {image:image});
         // }
         console.log('Query result: ', result);
-        navigation.navigate('InitFamily', {familyObj: JSON.stringify(result)});
+        navigation.navigate('InitFamily', {familyObj: result});
       } catch (error) {
-        if (error.response.status ==400) {
-          setApiError(error.response.data.error);
+        if (error.request.status ==400) {
+          setApiError('error');
         } else {
           setApiError('an error occured')
         }
-        console.log('Error during the post: ', error.response.data.error);
-        console.log('Server status: ',error.response.status);
-        console.log("error: ",error.message);
+        console.log('Error during the post: ', error.request);
+        // console.log('Server status: ',error.response.status);
+        // console.log("error: ",error.message);
       }
     }
   }
@@ -160,7 +164,8 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomColor: '#AAAAAA',
     borderBottomWidth: 0.7,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    color: 'black'
   },
   btn: {
     width: '85%',

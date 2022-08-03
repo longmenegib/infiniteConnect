@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
-import { useNavigation } from 'react-navigation-hooks';
+// import { useNavigation } from 'react-navigation-hooks';
 
-export default function UserConvo() {
-  const navigation = useNavigation();
+export default function UserConvo({navigation}) {
+  // const navigation = useNavigation();
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {

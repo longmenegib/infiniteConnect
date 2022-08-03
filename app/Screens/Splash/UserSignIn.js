@@ -1,58 +1,67 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Image, TextInput, Dimensions } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Image, TextInput, Dimensions, Alert, ScrollView } from 'react-native';
+// import { useNavigation } from 'react-navigation-hooks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import axios from '../../utils/axios';
 import { baseURL } from '../../../utilis/urls';
-import { authContext } from '../../Context.js/authContext';
+import { AccessContext } from '../../context/AccessContext';
+// import { AuthContext } from '../../context/AuthContext';
+import { Spinner } from 'native-base';
 
-export default function UserSignIn(){
-  const navigation = useNavigation();
+export default function UserSignIn({navigation}){
+  // const navigation = useNavigation();
   const [remember, setRemember] = useState(true);
   const [otp, setOtp] = useState('');
   const [phone, setPhone] = useState('');
   const [apiError, setApiError] = useState(null);
-  const {setUser} = useContext(authContext);
-  
+  const {setisLoggedIn} = useContext(AccessContext);
+  const [isSpinning, setIsSpinning] = useState(false);
+
+
   const handleSignIn = async() => {
-    setApiError(null)
+    setApiError(null);
+    setIsSpinning(true);
+    // navigation.navigate('MainTab', {screen: 'Home'})
     if (otp && phone) {
       console.log('Starting verification...');
       console.log('Otp: ', otp, 'Phone: ', phone)
-      try{
-        const {result} = await (await axios.post(baseURL + 'user-api/verify/kid', {otp, phone} )).data;
-        console.log("Kid registration data: ",result);
-        
-        const apiPoint= `${baseURL}user-api/kids/${result.kid.id}/`;
-        // console.log("Api point: ", apiPoint);
-        axios.defaults.headers.common['Authorization'] = `Token ${result.token}`;
-        const userData = await (await axios.get(apiPoint)).data;
-        // console.log('User informations: ', userData);
-        await setUser(userData);
-        // console.log("User: ", result.kid)
-        // console.log('User token: ', result.token)
-        if (remember) {
-          await Promise.all([
-            AsyncStorage.setItem('userId', JSON.stringify(result.kid.id)),
-            AsyncStorage.setItem('userToken', result.token),
-          ]);
-        }
-        navigation.navigate("Home");
-      } catch (error) {
-        // console.log("Error during verification: ",JSON.stringify(error))
-        console.log(error.response.status);
-        console.log(error.response.data);
-        setApiError(error.response.data.error);
-        // console.log(error.response.headers);
-        
+      let dataLog = {
+        otp: otp,
+        phone: phone
       }
+      await axios.post('/user-api/verify/kid', dataLog, { withCredentials: false, timeout: 10000 })
+      .then(async res => {
+        console.log(res.data);
+        // let userit = [];
+        // // userit = [...res.data,{account_type:'kid'}];
+        // userit= res.data;
+
+        // userit.account_type = 'kid';
+        // console.log(userit);
+        await AsyncStorage.setItem('userToken', JSON.stringify(res.data));
+        setisLoggedIn(true);
+        navigation.navigate('MainTab'); 
+      }).catch(err=>{
+        // console.log(err.request);
+        if(err.response.status === 400){
+          setApiError(err.response.data.error)
+          console.log(err.response.data)
+        }else if(err.response.status === 0){
+          Alert.alert(
+            'Error',
+            'Please check internet connection'
+          )
+        }
+      })
+      setIsSpinning(false);
     } else {
+      setIsSpinning(false);
       setApiError('phone and id numbers must not be empty')
     }
   }
 
   return(
-    <View style={styles.main}>
+    <ScrollView style={styles.main}>
       <StatusBar hidden={false} barStyle='dark-content' backgroundColor={'white'} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10 }}>
@@ -67,14 +76,16 @@ export default function UserSignIn(){
             value={otp}
             onChangeText={e => setOtp(e.toString())}
             placeholder='Enter your user ID'
-            style={[styles.input, {marginBottom:30}]} 
+            style={[styles.input, {marginBottom:30, color: 'gray'}]} 
+            placeholderTextColor='gray'
           />
           <TextInput 
             value={phone}
             onChangeText={(e) => setPhone(e)}
             placeholder='Enter your phone number'
-            style={styles.input} 
+            style={{...styles.input, color: 'gray'}} 
             keyboardType="phone-pad"
+            placeholderTextColor='gray'
           />
           {apiError? <Text style={{color:'red', alignSelf:'center'}} >{apiError}</Text> : null }
           <View style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -86,13 +97,18 @@ export default function UserSignIn(){
               <Text style={{ color: '#424242' }}>Forgot your ID? <Text style={{ color: '#15B715' }}>Request new</Text></Text>
             </TouchableOpacity>
           </View>
+          {isSpinning ? 
+            <View style={[styles.input, { marginTop: 40, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
+                <Spinner color='#15b715'/>
+            </View> : 
           <TouchableOpacity onPress={() => handleSignIn()} style={[styles.input, { marginTop: 40, alignItems: 'center', justifyContent: 'center', paddingLeft: 0, backgroundColor: '#e7f8e6'}]}>
             <Text style={{ color: '#15B715', fontSize: 17 }}>Sign In & Continue</Text>
           </TouchableOpacity>
+          }
         </View>
       </View>
       <Text style={{ padding: 10, textAlign: 'center', color: '#424242' }}>By signing in, you are agreeing to our <Text style={{ fontWeight: 'bold' }}>Terms of Use</Text> and our <Text style={{ fontWeight: 'bold' }}>Privacy Policy</Text></Text>
-    </View>
+    </ScrollView>
   )
 }
 

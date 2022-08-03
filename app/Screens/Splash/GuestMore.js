@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ImageBackground, Platform } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+// import { useNavigation } from 'react-navigation-hooks';
 import ImagePicker from 'react-native-image-crop-picker';
-import { authContext } from '../../Context.js/authContext';
+import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { baseURL } from '../../../utilis/urls';
 
 
-export default function GuestMore(){
+export default function GuestMore({navigation}){
     const [image, setImage] = useState(null);
     const [username, setUsername] = useState('');
-    const navigation = useNavigation();
-    const {user} = useContext(authContext);
+    // const navigation = useNavigation();
+    const {user} = useContext(AuthContext);
 
     const choosePhotoFromLibrary = () => {
         ImagePicker.openPicker({

@@ -1,15 +1,28 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ImageBackground, Modal } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+// import { useNavigation } from 'react-navigation-hooks';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { story } from '../../../utilis/story';
-import { authContext } from '../../Context.js/authContext';
+import { AuthContext } from '../../context/AuthContext';
 import ParentInformation from './ParentInformation'
 
-export default function LifeStory() {
-  const navigation = useNavigation();
+export default function LifeStory({navigation}) {
+  // const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
   const [rend, setRend] = useState(2);
-  const {user} = useContext(authContext);
+  const {user} = useContext(AuthContext);
+
+  const lifestorytell = async() => {
+    let userToken = await AsyncStorage.getItem('userToken')
+    let user = JSON.parse(userToken).result;
+    console.log(user);
+    if(user.kid.age <15) {
+      setShowModal(true)
+    } else {
+      setRend(1);
+    }
+    
+  }
 
   const putbtnStyle = (e) => {
     if(e == rend){
@@ -22,6 +35,8 @@ export default function LifeStory() {
   const putxtStyle = (e) => {
     if(e == rend){
       return { color: 'white', fontWeight: 'bold' }
+    }else{
+      return {color: 'black'}
     }
   }  
   const putModal = () => {
@@ -52,13 +67,7 @@ export default function LifeStory() {
       </View>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => {
-            if(user.age <15) {
-              setShowModal(true)
-            } else {
-              setRend(1);
-            }
-          }}
+          onPress={lifestorytell}
           style={putbtnStyle(1)}>
           <Text style={putxtStyle(1)}>Life story</Text>
         </TouchableOpacity>

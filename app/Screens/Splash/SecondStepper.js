@@ -1,9 +1,21 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { View, Text, StyleSheet, StatusBar, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+// import { useNavigation } from 'react-navigation-hooks';
+import { AuthContext } from '../../context/AuthContext';
 
-export default function SecondStepper(){
-  const navigation = useNavigation();
+export default function SecondStepper({navigation}){
+  // const navigation = useNavigation();
+  const {setIskIdAccount} = useContext(AuthContext);
+
+  const gotoSignIn = (type)=>{
+    if(type === 1){
+      setIskIdAccount(true);
+      navigation.navigate('UserSignIn')
+    }else{
+      setIskIdAccount(false);
+      navigation.navigate('GuestSignIn')
+    }
+  }
 
   return(
     <View style={styles.main}>
@@ -11,11 +23,11 @@ export default function SecondStepper(){
       <Image style={styles.logo} source={require('./../../Assets/Logo/icone.png')} />
       <Text style={{ fontSize: 25, color: 'white', fontWeight: 'bold' }}>Are you</Text>
       <View style={styles.section}>
-        <TouchableOpacity onPress={() => navigation.navigate('UserSignIn')} style={styles.pbtn}>
+        <TouchableOpacity onPress={() => gotoSignIn(1)} style={styles.pbtn}>
           <Image source={require('./../../Assets/icons/user.png')} style={styles.icon} />
           <Text style={{ color: 'white', fontStyle: 'italic', fontWeight: 'bold' }}>User</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('GuestSignIn')} style={styles.btn}>
+        <TouchableOpacity onPress={() => gotoSignIn(0)} style={styles.btn}>
           <Image source={require('./../../Assets/icons/guest.png')} style={styles.icon} />
           <Text style={{ color: '#28A7E3', fontStyle: 'italic', fontWeight: 'bold' }}>Invited</Text>
         </TouchableOpacity>

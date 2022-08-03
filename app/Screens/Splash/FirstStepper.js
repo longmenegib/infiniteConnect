@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, StatusBar, Image } from 'react-native';
-import { useNavigation, useIsFocused } from 'react-navigation-hooks';
+import { View, Text, StyleSheet, StatusBar, Image, TouchableOpacity } from 'react-native';
+// import { useNavigation, useIsFocused } from 'react-navigation-hooks';
 
-export default function FirstStepper(){
-  const navigation = useNavigation();
-  const isFocused = useIsFocused();
+export default function FirstStepper({navigation}){
+  // const isFocused = useIsFocused();
 
   useEffect(() => {
-    if(isFocused){
-      setTimeout(() => navigation.navigate("Second"), 1500);
-    }
-  }, [isFocused]);
+    // if(isFocused){
+      setTimeout(() => navigation.navigate("SecondStepper"), 1500);
+    // }
+  }, []);
 
   return(
     <View style={styles.main}>
@@ -20,7 +19,7 @@ export default function FirstStepper(){
       <Image source={require('./../../Assets/intro.png')} style={styles.img} />
       <View style={{ flexDirection: 'row', position: 'absolute', bottom: 100 }}>
         <View style={styles.adot} />
-        <View style={styles.dot} />
+        <TouchableOpacity style={styles.dot} onPress={()=>navigation.navigate('SecondStepper')}/>
         <View style={styles.dot} />
       </View>
     </View>

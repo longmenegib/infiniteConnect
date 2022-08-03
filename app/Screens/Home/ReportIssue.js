@@ -1,18 +1,45 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground, TextInput, Platform, Modal } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground, TextInput, Platform, Modal, ScrollView } from 'react-native';
+// import { useNavigation } from 'react-navigation-hooks';
 import ImagePicker from 'react-native-image-crop-picker';
-import axios from 'axios';
+import axios from '../../utils/axios';
 import { baseURL } from '../../../utilis/urls';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon, Header, Content, Picker, Form } from "native-base";
 
-
-export default function ReportIssue(){
-  const navigation = useNavigation();
+export default function ReportIssue({navigation}){
+  // const navigation = useNavigation();
   const [image, setImage] = useState(null)
   const [issueTitle, setIssueTitle] = useState('');
   const [issueDetails, setIssueDetails] = useState('');
   const [showModal, setShowModal] = useState(false);
+
+  const [agencies, setAgencies] = useState({});
+  const [selected, setSelected] = useState(null);
+  const [dropItems, setDropItems] = useState([1, 1, 2]);
+
+  useEffect(()=>{
+    getAgencies();
+    return ()=>{
+    }
+  }, []);
+  
+  const getAgencies = async()=>{
+    const user = await AsyncStorage.getItem('userToken')
+    const token = JSON.parse(user).result.token;
+    console.log("getting agencies", token)
+    await axios.get('/family-api/agencies/', { timeout: 10000, headers: {"Authorization": `Token ${token}`} })
+        .then(async res => {
+            if(res.data.results){
+                console.log('results: ',res.data.results)
+                setDropItems(res.data.results);
+                setSelected(res.data.results[0].id);
+            }
+        }).catch(err => {
+            console.log(err.request);
+  
+        })
+    }
 
   const choosePhotoFromLibrary = () => {
     ImagePicker.openPicker({
@@ -27,24 +54,51 @@ export default function ReportIssue(){
   };
 
   const onIssueReport = async() => {
-    if(issueTitle && issueDetails) {
+    if(issueTitle && issueDetails && selected) {
+      let imgToUpload = null;
+     
       console.log('starting query...');
-      console.log('description: ', issueDetails);
-      const userToken = await AsyncStorage.getItem('userToken');
-      try {
-        const result = await (await axios.post(baseURL+'report-api/issues/', {title:issueTitle, description:issueDetails})).data;
-        console.log('Report result: ', result);
-      } catch (error) {
-        // console.log('Error during the post: ', error.response.data.error)
-        console.log('Server status: ',error.response.status);
-        console.log("error: ",error.response.data.error);
-        // setApiError(error.response.data.error);
+      console.log('description: ', issueTitle);
+      const dataSend = new FormData();
+      dataSend.append('title', issueTitle);
+      dataSend.append('description', issueDetails);
+      dataSend.append('agency', selected);
+      if (image) {
+        imgToUpload = {
+          type:'image/jpeg',
+          name:image.split('/')[image.split('/').length-1],
+          uri:image
+        }
+        dataSend.append('image', imgToUpload);
       }
-      setShowModal(true)
+      
+      console.log(dataSend)
+      // return
+      const userToken = await AsyncStorage.getItem('userToken');
+      let token = JSON.parse(userToken).result.token;
+      await axios.post('/report-api/issues/', dataSend,
+       { timeout: 10000, headers: {"Authorization": `Token ${token}`,'Content-Type':'multipart/form-data'},
+       transformRequest:(data, headers) => {
+        return dataSend;
+      } })
+        .then(async res=>{
+          console.log('Report result: ', res);
+          setShowModal(true)
+        }).catch (error => {
+          console.log('Error during the post: ', error.request)
+          // console.log('Server status: ',error.response.status);
+          // console.log("error: ",error.response.data.error);
+          // setApiError(error.response.data.error);
+        });
+      // 
     }
   }
 
   const imageName = image ? image.split('/').pop() :null;
+
+  function onValueChange(value) {
+    setSelected(value.id)
+  }
   
   const putModal = (show, navigation) => {
     return(
@@ -66,26 +120,59 @@ export default function ReportIssue(){
   }
   return(
     <ImageBackground source={require('./../../Assets/bg.png')} style={styles.main}>
+      <ScrollView style={{flex: 1,}}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ position: 'absolute', top: 10, left: 10 }}>
           <Image source={require('./../../Assets/icons/back.png')} style={styles.back} />
         </TouchableOpacity>
-        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', marginLeft: -20 }}>
+        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center'}}>
           <Text style={{ color: 'black' }}>Report issue</Text>
         </View>
       </View>
       <View style={styles.body}>
+
+      <Text style={{ textAlign: 'left', color: '#424242' }}>Select the agency</Text>
+      <View style={styles.inputContainer}>
+              {/* <View style={styles.labelContainer}>
+                <Text style={{color:'#777'}}>Agency</Text>
+              </View> */}
+              <View style={{flexDirection:'row', alignItems:'center'}}>
+              <Form>
+            <Picker
+              mode="dropdown"
+              iosIcon={<Icon name="arrow-down" />}
+              placeholder="Select Agency"
+              placeholderStyle={{ color: "#000" }}
+              placeholderIconColor="#000"
+              style={{ width: '100%', height: 40,zIndex: 20,flex: 1, position: 'absolute', color: '#000',}}
+              selectedValue={selected}
+              onValueChange={onValueChange}
+            >
+              {dropItems.map((ele, index)=>{
+                return(
+                  <Picker.Item key={index} label={ele.name} value={ele.id} />
+                )
+              })}
+            </Picker>
+          </Form> 
+              </View>
+            </View>
+
+
         <TextInput
           placeholder='What is your issue about?'
           style={[styles.textarea, {minHeight:40, textAlignVertical:'center'}]}
           onChangeText={(text) => setIssueTitle(text)}
+          placeholderTextColor='gray'
         />
+
         <Text style={{ textAlign: 'left', color: '#424242' }}>Describe your issue in detail</Text>
         <TextInput
           multiline
           placeholder='Describe your issue'
           style={styles.textarea}
           onChangeText={(text) => setIssueDetails(text)}
+          placeholderTextColor='gray'
         />
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20 }}>
           <TouchableOpacity onPress={choosePhotoFromLibrary} style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -100,12 +187,13 @@ export default function ReportIssue(){
           </TouchableOpacity>
         </View>
         {imageName ? <Text style={{marginTop:10}}>{imageName}</Text>:null}
-        <TouchableOpacity style={styles.callbtn}>
+        {/* <TouchableOpacity style={styles.callbtn}>
           <Image source={require('./../../Assets/icons/phone.png')} style={[styles.back, { width: 25, height: 25, marginRight: 10 }]} />
           <Text style={{ color: 'white', fontSize: 17 }}>Emergency Call</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {putModal(showModal, navigation)}
+      </ScrollView>
     </ImageBackground>
   )
 }
@@ -128,9 +216,10 @@ const styles = StyleSheet.create({
     height: 20
   },
   body: {
-    flex: 1,
+    // flex: 1,
     paddingHorizontal: '5%',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: 60
   },
   textarea: {
     width: '100%',
@@ -142,7 +231,8 @@ const styles = StyleSheet.create({
     borderColor: '#28A7E3',
     textAlignVertical: 'top',
     padding: 10,
-    marginTop: 5,
+    marginTop: 15,
+    marginBottom: 15,
     color: '#424242'
   },
   send: {
@@ -189,5 +279,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 218,
     marginTop: 10
+  },
+  labelContainer: {
+    backgroundColor: 'white',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    marginLeft:30,
+    shadowColor: 'white', 
+    position: 'absolute',
+    top: -12,
+
+  },
+  inputContainer: {
+    borderWidth: 1,
+    borderColor:'#28A7E3',
+    borderRadius: 10,
+    // paddingHorizontal: 8,
+    // zIndex: 0,
+    position: 'relative',
+    height: 50,
+    marginTop: 10,
+    backgroundColor: '#eff8fd',
   },
 })

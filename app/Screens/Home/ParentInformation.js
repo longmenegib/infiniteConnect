@@ -1,27 +1,26 @@
-import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
+import axios from '../../utils/axios';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
-import { baseURL } from '../../../utilis/urls';
-import { authContext } from '../../Context.js/authContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ParentInformation(){
-  const navigation = useNavigation();
+
+export default function ParentInformation({navigation}){
+  // const navigation = useNavigation();
   const [parents, setParents] = useState({})
   const [loading, setLoading] = useState(false)
-  const {user} = useContext(authContext);
   
   const getParent = async() => {
     setLoading(true)
-    try {
-      const result = await (await axios.get(baseURL+'user-api/parent-infos/')).data; 
-      setParents(result.results[0])
-    } catch (error) {
-      console.log('Error during the post: ', error.response.data.error);
-      console.log('Server status: ',error.response.status);
-      console.log("error: ",error.response.data.error);
-    }
-    setLoading(false);
+    const user = await AsyncStorage.getItem('userToken')
+    const token = JSON.parse(user).result.token;
+    await axios.get('/user-api/parent-infos/', { timeout: 10000, headers: {"Authorization": `Token ${token}`} })
+      .then(res => {
+        console.log(res.data.results);
+        setParents(res.data.results[0])
+      }).catch(err=>{
+        console.log("error ", err.request)
+      })
+      setLoading(false);
   }
 
   useEffect(() => {
@@ -44,8 +43,8 @@ export default function ParentInformation(){
             <Text style={styles.val}>{!loading && (parents?.father_name||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Date of birth</Text>
-            <Text style={styles.val}>{!loading&&(parents?.father_name||'Unknown')}</Text>
+            <Text style={styles.label}>Phone Number</Text>
+            <Text style={styles.val}>{!loading&&(parents?.father_phone||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Location</Text>
@@ -62,8 +61,8 @@ export default function ParentInformation(){
             <Text style={styles.val}>{!loading&&(parents?.mother_name||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Date of birth</Text>
-            <Text style={styles.val}>01/02/1995</Text>
+            <Text style={styles.label}>Phone Number</Text>
+            <Text style={styles.val}>{!loading&&(parents?.mother_phone||'Unknown')}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Location</Text>

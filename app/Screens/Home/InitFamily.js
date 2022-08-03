@@ -1,31 +1,36 @@
-import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
-import { baseURL } from '../../../utilis/urls';
-import { authContext } from '../../Context.js/authContext';
+// import { useNavigation } from 'react-navigation-hooks';
+import axios from '../../utils/axios';
 
-export default function InitFamily(){
-  const navigation = useNavigation();
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export default function InitFamily({navigation, route}){
+  // const navigation = useNavigation();
   const [show, setShow] = useState(false);
   const [inviteePhone, setInviteePhone] = useState('');
-  const [family, setFamily] = useState(JSON.parse(navigation.state.params.familyObj))
+  const {familyObj} = route.params;
+  const [family, setFamily] = useState(familyObj);
   const [apiError, setApiError] = useState('');
 
-  const {user} = useContext(authContext);
+
 
   const sendInvitation = async() => {
     setApiError('');
-    if(inviteePhone) {
-      try {
-        const result = await (await axios.post(baseURL+user.id+'/invite-family', {phone:inviteePhone})).data;
-        console.log(result)
-      } catch (error) {
-        setApiError('an error occured');
-        console.log('Error during the post: ', error.response.data.error);
-        console.log('Server status: ',error.response.status);
-        // console.log("error: ",error.response.data.error);
-      }
+    let userToken = await AsyncStorage.getItem('userToken');
+    console.log(userToken)
+    let token = JSON.parse(userToken).result.token;
+    let id = JSON.parse(userToken).result.kid.user_id;
+    console.log(id);
+    // return
+    if (inviteePhone){
+      await axios.post(`/user-api/kids/${id}/invite-family`,  {phone:inviteePhone}, { timeout: 10000, headers: {"Authorization": `Token ${token}`} })
+      .then(async res => {
+        console.log('good',res.data);
+      }).catch(err=>{
+        console.log(err.request);
+      })
       setShow(false);
     }
   }

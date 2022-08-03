@@ -5,9 +5,9 @@ import { View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function Picker({initialValue, pickerItems}) {
-  console.log("Initial value: ", pickerItems);
+  // console.log("Initial value: ", pickerItems);
     const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState([]);
   const [items, setItems] = useState(pickerItems);
 
   return (
